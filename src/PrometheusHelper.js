@@ -1,9 +1,7 @@
 "use strict";
 
-const onFinished = require("on-finished");
-
 module.exports = class {
-    constructor(opts, promClient) {
+    constructor(opts) {
         this.opts = opts || {};
         this.promClient = this.opts.promClient || require("prom-client");
         this.metrics = {};

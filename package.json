@@ -1,7 +1,7 @@
 {
   "name": "express-prom-bundle",
   "version": "1.0.0",
-  "description": "express middleware with standard prometheus metrics in one bundle",
+  "description": "express middleware with popular prometheus metrics in one bundle",
   "main": "src/index.js",
   "directories": {
     "test": "test"
@@ -16,6 +16,9 @@
     "prom-client": "^3.4.0"
   },
   "devDependencies": {
-    "eslint": "^2.8.0"
+    "eslint": "^2.8.0",
+    "express": "^4.13.4",
+    "jasme": "^4.1.1",
+    "supertest": "^1.2.0"
   }
 }
