@@ -1,0 +1,21 @@
+{
+  "name": "express-prom-bundle",
+  "version": "1.0.0",
+  "description": "express middleware with standard prometheus metrics in one bundle",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node_modules/jasme/run.js"
+  },
+  "author": "Konstantin Pogorelov <or@pluseq.com> (https://github.com/disjunction)",
+  "license": "ISC",
+  "dependencies": {
+    "on-finished": "^2.3.0",
+    "prom-client": "^3.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^2.8.0"
+  }
+}
