@@ -37,7 +37,7 @@ const
 
 const express = require("express"),
     app = express(),
-    promBundle = require(".");
+    promBundle = require("express-prom-bundle");
 
 app.use(promBundle({
     prefix: "demo_app:something"
