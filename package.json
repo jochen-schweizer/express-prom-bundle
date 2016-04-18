@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "express middleware with popular prometheus metrics in one bundle",
   "main": "src/index.js",
-  "directories": {
-    "test": "test"
-  },
+  "keywords": [
+    "prometheus",
+    "metrics",
+    "express",
+    "bundle"
+  ],
   "scripts": {
     "test": "node_modules/jasme/run.js"
   },
