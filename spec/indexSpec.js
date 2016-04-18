@@ -9,7 +9,7 @@ describe("index", () => {
     const app = express();
     
     app.use(bundle({
-        prefix: "hello"
+        prefix: "hello:"
     }));
 
     it("/metrics returns up=1", done => {

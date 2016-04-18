@@ -18,8 +18,7 @@ module.exports = class {
     }
 
     makeRealName(name) {
-        const prefix = this.opts.prefix ? (this.opts.prefix + ":") : "";
-        return prefix + name;
+        return (this.opts.prefix || "") + name;
     }
 
     makeMetric(TheClass, name, description, param) {
