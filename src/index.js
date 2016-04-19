@@ -61,7 +61,6 @@ function main(opts) {
                 "http_request_duration",
                 "number of http responses labeled with status code",
                 {
-                    labels: ["bar"],
                     buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10]
                 }
             );
@@ -87,8 +86,8 @@ function main(opts) {
         let timer, labels;
 
         if (metrics["http_request_duration"]) {
-            timer = metrics["http_request_duration"].startTimer(labels);
             labels = {"status_code": 0};
+            timer = metrics["http_request_duration"].startTimer(labels);
         }
 
         if (req.path == "/metrics") {
