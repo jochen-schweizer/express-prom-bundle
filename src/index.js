@@ -56,9 +56,9 @@ function main(opts) {
             "nodejs_memory_heap_used_bytes",
             "value of process.memoryUsage().heapUsed"
         ),
-        "http_request_duration": () => {
+        "http_request_seconds": () => {
             const metric = factory.newHistogram(
-                "http_request_duration",
+                "http_request_seconds",
                 "number of http responses labeled with status code",
                 {
                     buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10]
@@ -85,9 +85,9 @@ function main(opts) {
     let middleware = function (req, res, next) {
         let timer, labels;
 
-        if (metrics["http_request_duration"]) {
+        if (metrics["http_request_seconds"]) {
             labels = {"status_code": 0};
-            timer = metrics["http_request_duration"].startTimer(labels);
+            timer = metrics["http_request_seconds"].startTimer(labels);
         }
 
         if (req.path == "/metrics") {
