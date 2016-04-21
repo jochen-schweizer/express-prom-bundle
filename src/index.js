@@ -5,10 +5,13 @@ const
     onFinished = require("on-finished");
 
 function filterArrayByRegExps(array, regexps) {
-    let compiled = regexps.map(regexp => new RegExp(regexp));
     return array.filter(element => {
-        for (let regexp of compiled) {
-            if (element.match(regexp)) {
+        for (let regexp of regexps) {
+            if (regexp instanceof RegExp) {
+                if (element.match(regexp)) {
+                    return true;
+                }
+            } else if (element == regexp) {
                 return true;
             }
         }

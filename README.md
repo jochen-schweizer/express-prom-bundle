@@ -10,7 +10,7 @@ Included metrics:
     
 * `up`: normally is just 1
 * `nodejs_memory_heap_total_bytes` and `nodejs_memory_heap_used_bytes`
-* `http_request_total`: count of http requests labeled with status_code
+* `http_request_seconds`: http latency histogram labeled with status_code
 
 ## Install
 
@@ -29,6 +29,7 @@ const
 ## Options
 
  * **prefix**:  prefix added to every metric name
+ * **whitelist**, **blacklist**: array of strings or regexp. These which metrics to include/exclude
 
 ## Example
 
@@ -40,7 +41,8 @@ const express = require("express"),
     promBundle = require("express-prom-bundle");
 
 app.use(promBundle({
-    prefix: "demo_app:something"
+    prefix: "demo_app:something",
+    blacklist: ["up"]
 }));
 
 app.get("/hello", (req, res) => res.send("ok"));
