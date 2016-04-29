@@ -24,6 +24,8 @@ npm install express-prom-bundle
 const
     promBundle = require("express-prom-bundle"),
     middleware = promBundle({/* options */ });
+
+app.use(middleware);
 ```
 
 ## Options
