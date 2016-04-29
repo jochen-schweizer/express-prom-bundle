@@ -49,3 +49,7 @@ app.get("/hello", (req, res) => res.send("ok"));
 
 app.listen(3000);
 ```
+
+## License
+
+MIT
