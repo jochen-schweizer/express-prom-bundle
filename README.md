@@ -10,7 +10,7 @@ Included metrics:
     
 * `up`: normally is just 1
 * `nodejs_memory_heap_total_bytes` and `nodejs_memory_heap_used_bytes`
-* `http_request_seconds`: http latency histogram labeled with status_code
+* `http_request_seconds`: http latency histogram labeled with `status_code`
 
 ## Install
 
@@ -32,6 +32,8 @@ const
  * **whitelist**, **blacklist**: array of strings or regexp. These which metrics to include/exclude
 
 ## Example
+
+setup std. metrics but exclude `up`-metric:
 
 ```javascript
 "use strict";
