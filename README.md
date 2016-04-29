@@ -1,4 +1,4 @@
-[![build status](https://api.travis-ci.org/disjunction/express-prom-bundle.png)](https://travis-ci.org/disjunction/express-prom-bundle)
+[![build status](https://travis-ci.org/jochen-schweizer/express-prom-bundle.png)](https://travis-ci.org/jochen-schweizer/express-prom-bundle)
 
 # express prometheus bundle
 
