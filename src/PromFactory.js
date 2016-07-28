@@ -21,28 +21,33 @@ module.exports = class {
         return (this.opts.prefix || "") + name;
     }
 
-    makeMetric(TheClass, name, description, param) {
+    makeMetric(TheClass, args) {
+        // convert pseudo-array
+        const applyParams = Array.prototype.slice.call(args);
+        const name = applyParams[0];
         this.checkDuplicate(name);
         const realName = this.makeRealName(name);
-        this.metrics[name] = new TheClass(
-            realName, description, param
-        );
+        applyParams[0] = realName;
+        applyParams.unshift(null); // add some dummy context for apply
+
+        // call constructor with variable params
+        this.metrics[name] = new (Function.prototype.bind.apply(TheClass, applyParams));
         return this.metrics[name];
     }
 
-    newCounter(name, description, labels) {
-        return this.makeMetric(this.promClient.Counter, name, description, labels);
+    newCounter() {
+        return this.makeMetric(this.promClient.Counter, arguments);
     }
 
-    newGauge(name, description, labels) {
-        return this.makeMetric(this.promClient.Gauge, name, description, labels);
+    newGauge() {
+        return this.makeMetric(this.promClient.Gauge, arguments);
     }
 
-    newHistogram(name, description, options) {
-        return this.makeMetric(this.promClient.Histogram, name, description, options);
+    newHistogram() {
+        return this.makeMetric(this.promClient.Histogram, arguments);
     }
 
-    newSummary(name, description, options) {
-        return this.makeMetric(this.promClient.Histogram, name, description, options);
+    newSummary() {
+        return this.makeMetric(this.promClient.Summary, arguments);
     }
 };

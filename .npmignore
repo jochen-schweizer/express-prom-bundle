@@ -3,3 +3,4 @@ docker-compose.yml
 spec
 .travis.yml
 .eslintrc
+coverage

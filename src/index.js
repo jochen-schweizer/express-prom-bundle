@@ -20,7 +20,7 @@ function filterArrayByRegExps(array, regexps) {
 }
 
 function prepareMetricNames(opts, metricTemplates) {
-    let names = Object.keys(metricTemplates);
+    const names = Object.keys(metricTemplates);
     if (opts.whitelist) {
         if (opts.blacklist) {
             throw new Error("you cannot have whitelist and blacklist at the same time");
@@ -35,16 +35,17 @@ function prepareMetricNames(opts, metricTemplates) {
 }
 
 function main(opts) {
+    opts = opts === undefined ? {} : opts;
     if (arguments[2] && arguments[1] && arguments[1].send) {
         arguments[1].status(500)
             .send("<h1>500 Error</h1>\n"
-                + "<p>Unexapected 3d param.\n"
+                + "<p>Unexapected 3d param in express-prom-bundle.\n"
                 + "<p>Did you just put express-prom-bundle into app.use "
                 + "without calling it as a function first?");
         return;
     }
 
-    let factory = new PromFactory(opts);
+    const factory = new PromFactory(opts);
 
     const metricTemplates = {
         "up": () => factory.newGauge(
@@ -63,11 +64,11 @@ function main(opts) {
             const metric = factory.newHistogram(
                 "http_request_seconds",
                 "number of http responses labeled with status code",
+                ["status_code"],
                 {
-                    buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 10]
+                    buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
                 }
             );
-            metric.labelNames = ["status_code"];
             return metric;
         }
     };
@@ -85,14 +86,12 @@ function main(opts) {
         metrics.up.set(1);
     }
 
-    let middleware = function (req, res, next) {
+    const middleware = function (req, res, next) {
         let timer, labels;
-
         if (metrics["http_request_seconds"]) {
             labels = {"status_code": 0};
             timer = metrics["http_request_seconds"].startTimer(labels);
         }
-
         if (req.path == "/metrics") {
             let memoryUsage = process.memoryUsage();
             if (metrics["nodejs_memory_heap_total_bytes"]) {
@@ -109,10 +108,8 @@ function main(opts) {
 
         if (timer) {
             onFinished(res, () => {
-                if (res.statusCode) {
-                    labels["status_code"] = res.statusCode;
-                    timer();
-                }
+                labels["status_code"] = res.statusCode;
+                timer();
             });
         }
 
