@@ -33,7 +33,7 @@ app.listen(3000);
 ```
 
 * call your endpoints
-* see your metrics here: [http://localhost:3000/metrics]()
+* see your metrics here: [http://localhost:3000/metrics](http://localhost:3000/metrics)
 
 ## Options
 
