@@ -20,9 +20,6 @@ npm install express-prom-bundle
 
 ## Usage
 
-You **MUST** call `app.use(metricsMiddleware)` before the `use`-ing your middleware,
-otherwise those won't count in `http_request_seconds` histogram
-
 ```javascript
 const promBundle = require("express-prom-bundle"),
 const metricsMiddleware = promBundle({/* options */ });
@@ -34,6 +31,14 @@ app.listen(3000);
 
 * call your endpoints
 * see your metrics here: [http://localhost:3000/metrics](http://localhost:3000/metrics)
+
+**ALERT!**
+
+The order in wich the routes are registered is important, since
+**only the routes registered after the express-prom-bundle will be measured**
+
+You can use this to your advantage to bypass some of the routes.
+See the example below.
 
 ## Options
 
@@ -52,10 +57,16 @@ const express = require("express"),
     app = express(),
     promBundle = require("express-prom-bundle");
 
+
+// calls to this route will not appear in metrics
+// because it's applied before promBundle
+app.get("/status", (req, res) => res.send("i am healthy"));
+
 app.use(promBundle({
     prefix: "demo_app:something"
 }));
 
+// calls to this route will appear in metrics
 app.get("/hello", (req, res) => res.send("ok"));
 
 app.listen(3000);
