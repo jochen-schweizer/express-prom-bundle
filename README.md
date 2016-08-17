@@ -45,6 +45,7 @@ See the example below.
  * **prefix**:  prefix added to every metric name
  * **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude
  * **buckets**: buckets used for `http_request_seconds` histogram
+ * **excludeRoutes**: array of strings or regexp specifying which routes should be skipped for `http_request_seconds` metric. It uses `req.path` as subject when checking
 
 ## Example
 
@@ -63,8 +64,12 @@ const express = require("express"),
 app.get("/status", (req, res) => res.send("i am healthy"));
 
 app.use(promBundle({
-    prefix: "demo_app:something"
+    prefix: "demo_app:something",
+    excludeRoutes: ["/foo"]
 }));
+
+// this call will NOT appear in metrics, because it matches excludeRoutes
+app.get("/foo", (req, res) => res.send("bar"));
 
 // calls to this route will appear in metrics
 app.get("/hello", (req, res) => res.send("ok"));

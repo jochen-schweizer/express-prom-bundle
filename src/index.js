@@ -4,18 +4,23 @@ const
     PromFactory = require("./PromFactory"),
     onFinished = require("on-finished");
 
-function filterArrayByRegExps(array, regexps) {
-    return array.filter(element => {
-        for (let regexp of regexps) {
-            if (regexp instanceof RegExp) {
-                if (element.match(regexp)) {
-                    return true;
-                }
-            } else if (element == regexp) {
+function matchVsRegExps(element, regexps) {
+    for (let regexp of regexps) {
+        if (regexp instanceof RegExp) {
+            if (element.match(regexp)) {
                 return true;
             }
+        } else if (element == regexp) {
+            return true;
         }
-        return false;
+    }
+    return false;
+}
+
+
+function filterArrayByRegExps(array, regexps) {
+    return array.filter(element => {
+        return matchVsRegExps(element, regexps);
     });
 }
 
@@ -87,11 +92,6 @@ function main(opts) {
     }
 
     const middleware = function (req, res, next) {
-        let timer, labels;
-        if (metrics["http_request_seconds"]) {
-            labels = {"status_code": 0};
-            timer = metrics["http_request_seconds"].startTimer(labels);
-        }
         if (req.path == "/metrics") {
             let memoryUsage = process.memoryUsage();
             if (metrics["nodejs_memory_heap_total_bytes"]) {
@@ -106,7 +106,14 @@ function main(opts) {
             return;
         }
 
-        if (timer) {
+        if (opts.excludeRoutes && matchVsRegExps(req.path, opts.excludeRoutes)) {
+            return next();
+        }
+
+        let labels;
+        if (metrics["http_request_seconds"]) {
+            labels = {"status_code": 0};
+            let timer = metrics["http_request_seconds"].startTimer(labels);
             onFinished(res, () => {
                 labels["status_code"] = res.statusCode;
                 timer();

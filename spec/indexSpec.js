@@ -78,4 +78,26 @@ describe("index", () => {
                     });
             });
     });
+    it("filters out the excludeRoutes", done => {
+       const app = express();
+        const instance = bundle({
+            excludeRoutes: ["/test"]
+        });
+        app.use(instance);
+        app.use("/test", (req, res) => res.send("it worked"));
+        const agent = supertest(app);
+        agent
+            .get("/test")
+            .end(() => {
+                const metricHashMap = instance.metrics.http_request_seconds.hashMap;
+                expect(metricHashMap["status_code:200"]).not.toBeDefined();
+
+                agent
+                    .get("/metrics")
+                    .end((err, res) => {
+                        expect(res.status).toBe(200);
+                        done();
+                    });
+            });
+    });
 });
