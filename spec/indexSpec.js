@@ -6,14 +6,16 @@ let express = require("express"),
     bundle = require("../");
 
 describe("index", () => {
-    it("/metrics returns up=1", done => {
+    it("metrics returns up=1", done => {
         const app = express();
-        app.use(bundle({
+        const bundled = bundle({
             prefix: "hello:",
             whitelist: ["up"]
-        }));
+        });
+        app.use(bundled);
+
         app.use("/test", (req, res) => res.send("it worked"));
-        
+
         const agent = supertest(app);
         agent.get("/test").end(() => {
             agent
@@ -25,6 +27,41 @@ describe("index", () => {
                 });
         });
     });
+
+    it("metrics should be attached to /metrics by default", done => {
+        const app = express();
+        const bundled = bundle({
+            prefix: "hello:",
+            whitelist: ["up"]
+        });
+        app.use(bundled);
+
+        const agent = supertest(app);
+        agent.get("/metrics")
+            .end((err, res) => {
+                expect(res.status).toBe(200);
+                done();
+            });
+    });
+
+    it("metrics can be attached to /metrics programatically", done => {
+        const app = express();
+        const bundled = bundle({
+            autoregister: false
+        });
+        app.use(bundled.metricsMiddleware);
+        app.use(bundled);
+
+        app.use("/test", (req, res) => res.send("it worked"));
+
+        const agent = supertest(app);
+        agent.get("/metrics")
+            .end((err, res) => {
+                expect(res.status).toBe(200);
+                done();
+            });
+    });
+
     it("metrics can be filtered using exect match", () => {
         const instance = bundle({blacklist: ["up"]});
         expect(instance.metrics.up).not.toBeDefined();
@@ -79,7 +116,7 @@ describe("index", () => {
             });
     });
     it("filters out the excludeRoutes", done => {
-       const app = express();
+        const app = express();
         const instance = bundle({
             excludeRoutes: ["/test"]
         });
