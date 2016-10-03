@@ -44,7 +44,7 @@ function main(opts) {
     if (arguments[2] && arguments[1] && arguments[1].send) {
         arguments[1].status(500)
             .send("<h1>500 Error</h1>\n"
-                + "<p>Unexapected 3rd param in express-prom-bundle.\n"
+                + "<p>Unexpected 3rd param in express-prom-bundle.\n"
                 + "<p>Did you just put express-prom-bundle into app.use "
                 + "without calling it as a function first?");
         return;
