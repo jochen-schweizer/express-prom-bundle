@@ -46,6 +46,7 @@ See the example below.
  * **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude
  * **buckets**: buckets used for `http_request_seconds` histogram
  * **excludeRoutes**: array of strings or regexp specifying which routes should be skipped for `http_request_seconds` metric. It uses `req.path` as subject when checking
+ * **autoregister**: boolean. If `/metrics` endpoint should be registered. It is **true** by default
 
 ## Example
 
