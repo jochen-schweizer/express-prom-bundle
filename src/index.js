@@ -40,11 +40,11 @@ function prepareMetricNames(opts, metricTemplates) {
 }
 
 function main(opts) {
-    opts = opts === undefined ? {} : opts;
+    opts = Object.assign({ autoregister: true }, opts || {} );
     if (arguments[2] && arguments[1] && arguments[1].send) {
         arguments[1].status(500)
             .send("<h1>500 Error</h1>\n"
-                + "<p>Unexapected 3d param in express-prom-bundle.\n"
+                + "<p>Unexpected 3rd param in express-prom-bundle.\n"
                 + "<p>Did you just put express-prom-bundle into app.use "
                 + "without calling it as a function first?");
         return;
@@ -91,19 +91,22 @@ function main(opts) {
         metrics.up.set(1);
     }
 
-    const middleware = function (req, res, next) {
-        if (req.path == "/metrics") {
-            let memoryUsage = process.memoryUsage();
-            if (metrics["nodejs_memory_heap_total_bytes"]) {
-                metrics["nodejs_memory_heap_total_bytes"].set(memoryUsage.heapTotal);
-            }
-            if (metrics["nodejs_memory_heap_used_bytes"]) {
-                metrics["nodejs_memory_heap_used_bytes"].set(memoryUsage.heapUsed);
-            }
+    const metricsMiddleware = function(req,res) {
+        let memoryUsage = process.memoryUsage();
+        if (metrics["nodejs_memory_heap_total_bytes"]) {
+            metrics["nodejs_memory_heap_total_bytes"].set(memoryUsage.heapTotal);
+        }
+        if (metrics["nodejs_memory_heap_used_bytes"]) {
+            metrics["nodejs_memory_heap_used_bytes"].set(memoryUsage.heapUsed);
+        }
 
-            res.contentType("text/plain")
-                .send(factory.promClient.register.metrics());
-            return;
+        res.contentType("text/plain").send(factory.promClient.register.metrics());
+        return;
+    };
+
+    const middleware = function (req, res, next) {
+        if (opts.autoregister && req.path == "/metrics") {
+            return metricsMiddleware(req,res);
         }
 
         if (opts.excludeRoutes && matchVsRegExps(req.path, opts.excludeRoutes)) {
@@ -127,7 +130,7 @@ function main(opts) {
     middleware.metricTemplates = metricTemplates;
     middleware.metrics = metrics;
     middleware.promClient = factory.promClient;
-
+    middleware.metricsMiddleware = metricsMiddleware;
     return middleware;
 }
 
