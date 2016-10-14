@@ -7,7 +7,7 @@ express middleware with popular prometheus metrics in one bundle.
 Internally it uses **prom-client**. See: https://github.com/siimon/prom-client
 
 Included metrics:
-    
+
 * `up`: normally is just 1
 * `nodejs_memory_heap_total_bytes` and `nodejs_memory_heap_used_bytes`
 * `http_request_seconds`: http latency histogram labeled with `status_code`
@@ -22,9 +22,21 @@ npm install express-prom-bundle
 
 ```javascript
 const promBundle = require("express-prom-bundle"),
-const metricsMiddleware = promBundle({/* options */ });
+      metricsMiddleware = promBundle({/* options */ });
 
 app.use(metricsMiddleware);
+app.use(/* your middleware */);
+app.listen(3000);
+```
+
+**Usage Koa Framework (currently only v1)**
+
+```javascript
+const promBundle = require("express-prom-bundle"),
+      c2k = require("koa-connect"),
+      metricsMiddleware = promBundle({/* options */ });
+
+app.use(c2k(metricsMiddleware));
 app.use(/* your middleware */);
 app.listen(3000);
 ```
@@ -56,8 +68,8 @@ setup std. metrics but exclude `up`-metric:
 "use strict";
 
 const express = require("express"),
-    app = express(),
-    promBundle = require("express-prom-bundle");
+      app = express(),
+      promBundle = require("express-prom-bundle");
 
 
 // calls to this route will not appear in metrics
