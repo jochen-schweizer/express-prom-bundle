@@ -3,7 +3,10 @@
 
 let express = require("express"),
     supertest = require("supertest"),
-    bundle = require("../");
+    bundle = require("../"),
+    koa = require("koa"),
+    c2k = require("koa-connect"),
+    supertestKoa = require("supertest-koa-agent");
 
 describe("index", () => {
     it("metrics returns up=1", done => {
@@ -136,5 +139,32 @@ describe("index", () => {
                         done();
                     });
             });
+    });
+
+    it("Koa: metrics returns up=1", done => {
+        const app = koa();
+        const bundled = bundle({
+            prefix: "hello:",
+            whitelist: ["up"]
+        });
+        app.use(c2k(bundled));
+
+        app.use(function*(next) {
+            if (this.path !== "test") {
+                return yield next;
+            }
+            this.body = "it worked";
+        });
+
+        const agent = supertestKoa(app);
+        agent.get("/test").end(() => {
+            agent
+                .get("/metrics")
+                .end((err, res) => {
+                    expect(res.status).toBe(200);
+                    expect(res.text).toMatch(/hello:up\s1/);
+                    done();
+                });
+        });
     });
 });

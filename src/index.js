@@ -1,8 +1,8 @@
 "use strict";
 
-const
-    PromFactory = require("./PromFactory"),
-    onFinished = require("on-finished");
+const PromFactory = require("./PromFactory"),
+      onFinished = require("on-finished"),
+	    url = require("url");
 
 function matchVsRegExps(element, regexps) {
     for (let regexp of regexps) {
@@ -16,7 +16,6 @@ function matchVsRegExps(element, regexps) {
     }
     return false;
 }
-
 
 function filterArrayByRegExps(array, regexps) {
     return array.filter(element => {
@@ -78,9 +77,8 @@ function main(opts) {
         }
     };
 
-    const
-        metrics = {},
-        names = prepareMetricNames(opts, metricTemplates);
+    const metrics = {},
+          names = prepareMetricNames(opts, metricTemplates);
 
 
     for (let name of names) {
@@ -100,20 +98,23 @@ function main(opts) {
             metrics["nodejs_memory_heap_used_bytes"].set(memoryUsage.heapUsed);
         }
 
-        res.contentType("text/plain").send(factory.promClient.register.metrics());
-        return;
+	      res.writeHead(200, {"Content-Type": "text/plain"});
+        res.end(factory.promClient.register.metrics());
     };
 
     const middleware = function (req, res, next) {
-        if (opts.autoregister && req.path == "/metrics") {
+
+    		const path = req.path || url.parse(req.url).pathname;
+    		let labels;
+
+        if (opts.autoregister && path == "/metrics") {
             return metricsMiddleware(req,res);
         }
 
-        if (opts.excludeRoutes && matchVsRegExps(req.path, opts.excludeRoutes)) {
+        if (opts.excludeRoutes && matchVsRegExps(path, opts.excludeRoutes)) {
             return next();
         }
 
-        let labels;
         if (metrics["http_request_seconds"]) {
             labels = {"status_code": 0};
             let timer = metrics["http_request_seconds"].startTimer(labels);
@@ -123,7 +124,8 @@ function main(opts) {
             });
         }
 
-        next();
+	      next();
+
     };
 
     middleware.factory = factory;
