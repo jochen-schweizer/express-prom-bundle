@@ -2,7 +2,7 @@
 
 # express prometheus bundle
 
-express middleware with popular prometheus metrics in one bundle.
+Express middleware with popular prometheus metrics in one bundle. It's also compatible with koa v1 (see below).
 
 Internally it uses **prom-client**. See: https://github.com/siimon/prom-client
 
@@ -22,21 +22,10 @@ npm install express-prom-bundle
 
 ```javascript
 const promBundle = require("express-prom-bundle"),
-      metricsMiddleware = promBundle({/* options */ });
+      metricsMiddleware = promBundle({/* options */ }),
+      app = require("express")();
 
 app.use(metricsMiddleware);
-app.use(/* your middleware */);
-app.listen(3000);
-```
-
-**Usage Koa Framework (currently only v1)**
-
-```javascript
-const promBundle = require("express-prom-bundle"),
-      c2k = require("koa-connect"),
-      metricsMiddleware = promBundle({/* options */ });
-
-app.use(c2k(metricsMiddleware));
 app.use(/* your middleware */);
 app.listen(3000);
 ```
@@ -60,7 +49,7 @@ See the example below.
  * **excludeRoutes**: array of strings or regexp specifying which routes should be skipped for `http_request_seconds` metric. It uses `req.path` as subject when checking
  * **autoregister**: boolean. If `/metrics` endpoint should be registered. It is **true** by default
 
-## Example
+## express example
 
 setup std. metrics but exclude `up`-metric:
 
@@ -91,6 +80,21 @@ app.listen(3000);
 ```
 
 See an [advanced example on github](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
+
+## koa v1 example
+
+```javascript
+const promBundle = require("express-prom-bundle"),
+      koa = require("koa"),
+      c2k = require("koa-connect"),
+      metricsMiddleware = promBundle({/* options */ });
+
+const app = koa();
+
+app.use(c2k(metricsMiddleware));
+app.use(/* your middleware */);
+app.listen(3000);
+```
 
 ## License
 

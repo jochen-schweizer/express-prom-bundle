@@ -1,8 +1,8 @@
 "use strict";
 
-const PromFactory = require("./PromFactory"),
-      onFinished = require("on-finished"),
-	    url = require("url");
+const PromFactory = require("./PromFactory");
+const onFinished = require("on-finished");
+const url = require("url");
 
 function matchVsRegExps(element, regexps) {
     for (let regexp of regexps) {
@@ -77,9 +77,8 @@ function main(opts) {
         }
     };
 
-    const metrics = {},
-          names = prepareMetricNames(opts, metricTemplates);
-
+    const metrics = {};
+    const names = prepareMetricNames(opts, metricTemplates);
 
     for (let name of names) {
         metrics[name] = metricTemplates[name]();
@@ -98,14 +97,14 @@ function main(opts) {
             metrics["nodejs_memory_heap_used_bytes"].set(memoryUsage.heapUsed);
         }
 
-	      res.writeHead(200, {"Content-Type": "text/plain"});
+        res.writeHead(200, {"Content-Type": "text/plain"});
         res.end(factory.promClient.register.metrics());
     };
 
     const middleware = function (req, res, next) {
 
-    		const path = req.path || url.parse(req.url).pathname;
-    		let labels;
+        const path = req.path || url.parse(req.url).pathname;
+        let labels;
 
         if (opts.autoregister && path == "/metrics") {
             return metricsMiddleware(req,res);
@@ -124,8 +123,7 @@ function main(opts) {
             });
         }
 
-	      next();
-
+        next();
     };
 
     middleware.factory = factory;
