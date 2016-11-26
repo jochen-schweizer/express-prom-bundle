@@ -17,10 +17,6 @@ describe("PromFactory", () => {
         expect(metric.help).toBe("help for test1");
         expect(metric.labelNames).toEqual(["label1", "label2"]);
     });
-    it("throws on duplicate names", () => {
-        factory.newCounter("n","h");
-        expect(() => factory.newCounter("n","h2")).toThrow();
-    });
     it("creates Gauge", () => {
         const metric = factory.newGauge(
             "test2",

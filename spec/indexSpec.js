@@ -1,14 +1,19 @@
 "use strict";
 /* eslint-env jasmine */
 
-let express = require("express"),
-    supertest = require("supertest"),
-    bundle = require("../"),
-    koa = require("koa"),
-    c2k = require("koa-connect"),
-    supertestKoa = require("supertest-koa-agent");
+const express = require("express");
+const supertest = require("supertest");
+const bundle = require("../");
+const koa = require("koa");
+const c2k = require("koa-connect");
+const supertestKoa = require("supertest-koa-agent");
+const promClient = require("prom-client");
 
 describe("index", () => {
+    beforeEach(() => {
+        promClient.register.clear();
+    });
+
     it("metrics returns up=1", done => {
         const app = express();
         const bundled = bundle({
@@ -132,6 +137,28 @@ describe("index", () => {
                 const metricHashMap = instance.metrics.http_request_seconds.hashMap;
                 expect(metricHashMap["status_code:200"]).not.toBeDefined();
 
+                agent
+                    .get("/metrics")
+                    .end((err, res) => {
+                        expect(res.status).toBe(200);
+                        done();
+                    });
+            });
+    });
+
+    it("tolerates includePath, includeMethod and keepDefaultMetrics", done => {
+        const app = express();
+        const instance = bundle({
+            includePath: true,
+            includeMethod: true,
+            keepDefaultMetrics: true
+        });
+        app.use(instance);
+        app.use("/test", (req, res) => res.send("it worked"));
+        const agent = supertest(app);
+        agent
+            .get("/test")
+            .end(() => {
                 agent
                     .get("/metrics")
                     .end((err, res) => {

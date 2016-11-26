@@ -46,8 +46,26 @@ See the example below.
  * **prefix**:  prefix added to every metric name
  * **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude
  * **buckets**: buckets used for `http_request_seconds` histogram
+ * **includeMethod**: include HTTP method (GET, PUT, ...) as a label to `http_request_seconds`
+ * **includePath**: include URL path as a label - **EXPERIMENTAL!** (see below)
+ * **normalizePath**: boolean or `function(req)` - path normalization for `includePath` option
  * **excludeRoutes**: array of strings or regexp specifying which routes should be skipped for `http_request_seconds` metric. It uses `req.path` as subject when checking
- * **autoregister**: boolean. If `/metrics` endpoint should be registered. It is **true** by default
+ * **autoregister**: if `/metrics` endpoint should be registered. It is (Default: **true**)
+ * **keepDefaultMetrics**: if default metrics provided by **prom-client** should be probed and delivered. (Default: **false**)
+
+### includePath option
+
+The goal is to have separate latency statistics by URL path, e.g. `/my-app/user/`, `/products/by-category` etc.
+
+But just taking `req.path` as a label value won't work as IDs are often part of the URL, like `/user/12352/profile`. So what we actually need is a path template. The automatically module tries to figure out what parts of the path are values or IDs, and what is an actual path. The example mentioned before would be normalized to `/user/#val/profile` and that will become the value for the label.
+
+You can override this magical behavior and create define your own function by providing an optional callback **normalizePath**.
+
+For more details:
+ * [url-value-parser](https://www.npmjs.com/package/url-value-parser) - magic behind automatic path normalization
+ * [normalizePath.js](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/src/normalizePath.js) - source code for path processing, for you
+
+
 
 ## express example
 
@@ -95,6 +113,12 @@ app.use(c2k(metricsMiddleware));
 app.use(/* your middleware */);
 app.listen(3000);
 ```
+
+## Changelog
+
+ * **1.2.0**
+    * upgrade prom-client to 6.1.2
+    * add options: includeMethod, includePath, keepDefaultMetrics
 
 ## License
 

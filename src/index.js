@@ -3,6 +3,8 @@
 const PromFactory = require("./PromFactory");
 const onFinished = require("on-finished");
 const url = require("url");
+const promClient = require("prom-client");
+const normalizePath = require("./normalizePath");
 
 function matchVsRegExps(element, regexps) {
     for (let regexp of regexps) {
@@ -49,6 +51,12 @@ function main(opts) {
         return;
     }
 
+    // remove default metrics provided by prom-client
+    if (!opts.keepDefaultMetrics) {
+        clearInterval(promClient.defaultMetrics());
+        promClient.register.clear();
+    }
+
     const factory = new PromFactory(opts);
 
     const metricTemplates = {
@@ -65,10 +73,17 @@ function main(opts) {
             "value of process.memoryUsage().heapUsed"
         ),
         "http_request_seconds": () => {
+            const labels = ["status_code"];
+            if (opts.includeMethod) {
+                labels.push("method");
+            }
+            if (opts.includePath) {
+                labels.push("path");
+            }
             const metric = factory.newHistogram(
                 "http_request_seconds",
                 "number of http responses labeled with status code",
-                ["status_code"],
+                labels,
                 {
                     buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
                 }
@@ -118,7 +133,13 @@ function main(opts) {
             labels = {"status_code": 0};
             let timer = metrics["http_request_seconds"].startTimer(labels);
             onFinished(res, () => {
-                labels["status_code"] = res.statusCode;
+                labels.status_code = res.statusCode;
+                if (opts.includeMethod) {
+                    labels.method = req.method;
+                }
+                if (opts.includePath) {
+                    labels.path = normalizePath(req, opts);
+                }
                 timer();
             });
         }
@@ -134,4 +155,5 @@ function main(opts) {
     return middleware;
 }
 
+main.promClient = promClient;
 module.exports = main;
