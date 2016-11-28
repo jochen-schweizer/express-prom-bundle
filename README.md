@@ -116,7 +116,7 @@ app.listen(3000);
 
 ## Changelog
 
- * **1.2.0**
+ * **1.2.1**
     * upgrade prom-client to 6.1.2
     * add options: includeMethod, includePath, keepDefaultMetrics
 
