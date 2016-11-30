@@ -51,10 +51,16 @@ function main(opts) {
         return;
     }
 
-    // remove default metrics provided by prom-client
+    // this is a really messy hack but needed for compatibility with v1
+    // will be completely removed in v2
     if (!opts.keepDefaultMetrics) {
+        const metrics = promClient.register.getMetricsAsJSON();
         clearInterval(promClient.defaultMetrics());
-        promClient.register.clear();
+        metrics.forEach(metric => {
+            if (!opts.prefix || metric.name.substr(0, opts.prefix.length) != opts.prefix) {
+                promClient.register.removeSingleMetric(metric.name);
+            }
+        });
     }
 
     const factory = new PromFactory(opts);

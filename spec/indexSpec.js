@@ -9,6 +9,17 @@ const c2k = require("koa-connect");
 const supertestKoa = require("supertest-koa-agent");
 const promClient = require("prom-client");
 
+// had to reinvent, because getSingleMetric() is still not in npm
+function myGetSingleMetric(name) {
+    let returnMetric;
+    promClient.register.getMetricsAsJSON().forEach(metric => {
+        if (metric.name === name) {
+            returnMetric = metric;
+        }
+    });
+    return returnMetric;
+}
+
 describe("index", () => {
     beforeEach(() => {
         promClient.register.clear();
@@ -144,6 +155,29 @@ describe("index", () => {
                         done();
                     });
             });
+    });
+
+    describe("initial metrics removal", () => {
+        it("removes unexpected metrics on start with no prefix", () => {
+            new promClient.Counter("foo", "bar");
+            expect(myGetSingleMetric("foo")).toBeDefined();
+            bundle();
+            expect(myGetSingleMetric("foo")).not.toBeDefined();
+        });
+
+        it("removes unexpected metrics on start with a prefix", () => {
+            new promClient.Counter("foo", "bar");
+            expect(myGetSingleMetric("foo")).toBeDefined();
+            bundle({prefix: "some_test_"});
+            expect(myGetSingleMetric("foo")).not.toBeDefined();
+        });
+
+        it("doesnt remove metrics with matched prefix", () => {
+            new promClient.Counter("some_test_foo", "bar");
+            expect(myGetSingleMetric("some_test_foo")).toBeDefined();
+            bundle({prefix: "some_test_"});
+            expect(myGetSingleMetric("some_test_foo")).toBeDefined();
+        });
     });
 
     it("tolerates includePath, includeMethod and keepDefaultMetrics", done => {
