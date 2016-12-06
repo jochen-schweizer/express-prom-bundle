@@ -15,6 +15,12 @@ module.exports = class {
         const applyParams = Array.prototype.slice.call(args);
         const name = applyParams[0];
         const realName = this.makeRealName(name);
+
+        const existing = this.promClient.register.getSingleMetric(realName);
+        if (existing) {
+            return existing;
+        }
+
         applyParams[0] = realName;
         applyParams.unshift(null); // add some dummy context for apply
 

@@ -1,6 +1,6 @@
 {
   "name": "express-prom-bundle",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "express middleware with popular prometheus metrics in one bundle",
   "main": "src/index.js",
   "keywords": [
@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "on-finished": "^2.3.0",
-    "prom-client": "^6.1.2",
+    "prom-client": "^6.2.0",
     "url-value-parser": "^1.0.0"
   },
   "devDependencies": {

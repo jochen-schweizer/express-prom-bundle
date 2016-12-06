@@ -49,5 +49,17 @@ describe("PromFactory", () => {
         expect(metric.help).toBe("help for test4");
         expect(metric.percentiles).toEqual([0.1, 0.5]);
     });
-
+    it("when regsitered with same name, just return old instance", () => {
+        const metric1 = factory.newSummary(
+            "test4",
+            "help for test4",
+            {percentiles: [0.1, 0.5]}
+        );
+        const metric2 = factory.newSummary(
+            "test4",
+            "help for test4",
+            {percentiles: [0.1, 0.5]}
+        );
+        expect(metric1).toBe(metric2);
+    });
 });
