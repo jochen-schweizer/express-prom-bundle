@@ -49,16 +49,13 @@ function main(opts) {
     return;
   }
 
-  // this is a really messy hack but needed for compatibility with v1
-  // will be completely removed in v2
-  if (opts.keepDefaultMetrics === false) {
-    const metrics = promClient.register.getMetricsAsJSON();
-    clearInterval(promClient.defaultMetrics());
-    metrics.forEach(metric => {
-      if (!opts.prefix || metric.name.substr(0, opts.prefix.length) !== opts.prefix) {
-        promClient.register.removeSingleMetric(metric.name);
-      }
-    });
+  if (opts.prefix || opts.keepDefaultMetrics !== undefined) {
+    throw new Error(
+      'express-prom-bundle detected obsolete options:'
+      + 'prefix and/or keepDefaultMetrics. '
+      + 'Please refer to oficial docs. '
+      + 'Most likely you upgraded the module without necessary code changes'
+    );
   }
 
   const httpMtricName = opts.httpDurationMetricName || 'http_request_duration_seconds';
@@ -68,7 +65,7 @@ function main(opts) {
       'up',
       '1 = up, 0 = not up'
     ),
-    'http_request_seconds': () => {
+    'http_request_duration_seconds': () => {
       const labels = ['status_code'];
       if (opts.includeMethod) {
         labels.push('method');

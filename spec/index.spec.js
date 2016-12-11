@@ -9,17 +9,6 @@ const c2k = require('koa-connect');
 const supertestKoa = require('supertest-koa-agent');
 const promClient = require('prom-client');
 
-// had to reinvent, because getSingleMetric() is still not in npm
-function myGetSingleMetric(name) {
-  let returnMetric;
-  promClient.register.getMetricsAsJSON().forEach(metric => {
-    if (metric.name === name) {
-      returnMetric = metric;
-    }
-  });
-  return returnMetric;
-}
-
 describe('index', () => {
   beforeEach(() => {
     promClient.register.clear();
@@ -48,7 +37,6 @@ describe('index', () => {
   it('metrics should be attached to /metrics by default', done => {
     const app = express();
     const bundled = bundle({
-      prefix: 'hello:',
       whitelist: ['up']
     });
     app.use(bundled);
@@ -132,6 +120,7 @@ describe('index', () => {
           });
       });
   });
+
   it('filters out the excludeRoutes', done => {
     const app = express();
     const instance = bundle({
@@ -155,19 +144,15 @@ describe('index', () => {
       });
   });
 
-  it('removes metrics on start with ', () => {
-    new promClient.Counter('foo', 'bar');
-    expect(promClient.getSingleMetric('foo')).toBeDefined();
-    bundle();
-    expect(promClient.getSingleMetric('foo')).not.toBeDefined();
+  it('complains about deprecated options', () => {
+    expect(() => bundle({prefix: 'hello'})).toThrow();
   });
 
-  it('tolerates includePath, includeMethod and keepDefaultMetrics', done => {
+  it('tolerates includePath, includeMethod', done => {
     const app = express();
     const instance = bundle({
       includePath: true,
-      includeMethod: true,
-      keepDefaultMetrics: true
+      includeMethod: true
     });
     app.use(instance);
     app.use('/test', (req, res) => res.send('it worked'));
@@ -187,7 +172,6 @@ describe('index', () => {
   it('Koa: metrics returns up=1', done => {
     const app = koa();
     const bundled = bundle({
-      prefix: 'hello:',
       whitelist: ['up']
     });
     app.use(c2k(bundled));
@@ -205,7 +189,7 @@ describe('index', () => {
         .get('/metrics')
         .end((err, res) => {
           expect(res.status).toBe(200);
-          expect(res.text).toMatch(/hello:up\s1/);
+          expect(res.text).toMatch(/^up\s1/m);
           done();
         });
     });
