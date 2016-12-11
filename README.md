@@ -11,7 +11,7 @@ Included metrics:
 * `up`: normally is just 1
 * `http_request_duration_seconds`: http latency histogram labeled with `status_code`, `method` and `path`
 
-**Please not version 2.x is NOT compatible with 1.x**
+**Please note version 2.x is NOT backwards compatible with 1.x**
 
 ## Install
 
@@ -36,7 +36,7 @@ app.listen(3000);
 
 **ALERT!**
 
-The order in wich the routes are registered is important, since
+The order in which the routes are registered is important, since
 **only the routes registered after the express-prom-bundle will be measured**
 
 You can use this to your advantage to bypass some of the routes.
