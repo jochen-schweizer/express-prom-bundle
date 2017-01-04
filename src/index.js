@@ -123,7 +123,7 @@ function main(opts) {
           labels.method = req.method;
         }
         if (opts.includePath) {
-          labels.path = normalizePath(req, opts);
+          labels.path = main.normalizePath(req, opts);
         }
         timer();
       });
@@ -140,4 +140,5 @@ function main(opts) {
 }
 
 main.promClient = promClient;
+main.normalizePath = normalizePath;
 module.exports = main;
