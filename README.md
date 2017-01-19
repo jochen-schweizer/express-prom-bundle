@@ -51,6 +51,7 @@ See the example below.
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
 * **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude
 * **excludeRoutes**: (deprecated) array of strings or regexp specifying which routes should be skipped for `http_request_duration_seconds` metric. It uses `req.originalUrl` as subject when checking. You want normally use express or meddleware features instead of this options.
+
 ### More details on includePath option
 
 The goal is to have separate latency statistics by URL path, e.g. `/my-app/user/`, `/products/by-category` etc.
@@ -99,10 +100,12 @@ const promBundle = require("express-prom-bundle");
 // because it's applied before promBundle
 app.get("/status", (req, res) => res.send("i am healthy"));
 
-// register metrics collection for all routes except those starting with /foo
+// register metrics collection for all routes
+// ... except those starting with /foo
 app.use("/((?!foo))*", promBundle({includePath: true}));
 
-// this call will NOT appear in metrics, because express will skip the metrics middleware
+// this call will NOT appear in metrics,
+// because express will skip the metrics middleware
 app.get("/foo", (req, res) => res.send("bar"));
 
 // calls to this route will appear in metrics
