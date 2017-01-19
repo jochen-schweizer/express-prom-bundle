@@ -1,6 +1,5 @@
 'use strict';
 const onFinished = require('on-finished');
-const url = require('url');
 const promClient = require('prom-client');
 const normalizePath = require('./normalizePath');
 
@@ -39,7 +38,7 @@ function prepareMetricNames(opts, metricTemplates) {
 }
 
 function main(opts) {
-  opts = Object.assign({autoregister: true}, opts || {});
+  opts = Object.assign({autoregister: true}, opts);
   if (arguments[2] && arguments[1] && arguments[1].send) {
     arguments[1].status(500)
       .send('<h1>500 Error</h1>\n'
@@ -96,18 +95,17 @@ function main(opts) {
     metrics.up.set(1);
   }
 
-  const metricsMiddleware = function(req,res) {
+  const metricsMiddleware = function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     res.end(promClient.register.metrics());
   };
 
   const middleware = function (req, res, next) {
-
-    const path = req.path || url.parse(req.url).pathname;
+    const path = req.originalUrl;
     let labels;
 
-    if (opts.autoregister && path === '/metrics') {
-      return metricsMiddleware(req,res);
+    if (opts.autoregister && path.match(/^\/metrics\/?$/)) {
+      return metricsMiddleware(req, res);
     }
 
     if (opts.excludeRoutes && matchVsRegExps(path, opts.excludeRoutes)) {

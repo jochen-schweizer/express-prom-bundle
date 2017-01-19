@@ -48,10 +48,9 @@ See the example below.
 * **includeMethod**: include HTTP method (GET, PUT, ...) as a label to `http_request_duration_seconds`
 * **includePath**: include URL path as a label (see below)
 * **normalizePath**: boolean or `function(req)` - path normalization for `includePath` option
-* **excludeRoutes**: array of strings or regexp specifying which routes should be skipped for `http_request_duration_seconds` metric. It uses `req.path` as subject when checking
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
 * **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude
-
+* **excludeRoutes**: (deprecated) array of strings or regexp specifying which routes should be skipped for `http_request_duration_seconds` metric. It uses `req.originalUrl` as subject when checking. You want normally use express or meddleware features instead of this options.
 ### More details on includePath option
 
 The goal is to have separate latency statistics by URL path, e.g. `/my-app/user/`, `/products/by-category` etc.
@@ -71,23 +70,18 @@ For more details:
 setup std. metrics but exclude `up`-metric:
 
 ```javascript
-"use strict";
-
 const express = require("express");
 const app = express();
 const promBundle = require("express-prom-bundle");
-
 
 // calls to this route will not appear in metrics
 // because it's applied before promBundle
 app.get("/status", (req, res) => res.send("i am healthy"));
 
-app.use(promBundle({
-    includePath: true,
-    excludeRoutes: ["/foo"]
-}));
+// register metrics collection for all routes except those starting with /foo
+app.use("/((?!foo))*", promBundle({includePath: true}));
 
-// this call will NOT appear in metrics, because it matches excludeRoutes
+// this call will NOT appear in metrics, because express will skip the metrics middleware
 app.get("/foo", (req, res) => res.send("bar"));
 
 // calls to this route will appear in metrics
@@ -113,8 +107,34 @@ app.use(/* your middleware */);
 app.listen(3000);
 ```
 
+## Using together with kraken.js
+
+Here is meddleware config sample, which can be used in a standard **kraken.js** application:
+
+```json
+{
+  "middleware": {
+    "expressPromBundle": {
+      "route": "/((?!status|favicon.ico|robots.txt))*",
+      "priority": 0,
+      "module": {
+        "name": "express-prom-bundle",
+        "arguments": [
+          {
+            "includeMethod": true,
+            "buckets": [0.1, 1, 5]
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
 ## Changelog
 
+ * **2.1.0**
+    * deprecate **excludeRoutes**, use **req.originalPath** instead of **req.path**
  * **2.0.0**
     * the reason for the version lift were:
       * compliance to official naming recommendation: https://prometheus.io/docs/practices/naming/
