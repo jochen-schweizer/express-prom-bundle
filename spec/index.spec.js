@@ -169,6 +169,30 @@ describe('index', () => {
       });
   });
 
+  it('normalizePath can be replaced', done => {
+    const app = express();
+    const original = bundle.normalizePath;
+    bundle.normalizePath = () => 'dummy';
+    const instance = bundle({
+      includePath: true,
+    });
+    app.use(instance);
+    app.use('/test', (req, res) => res.send('it worked'));
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/"dummy"/m);
+            bundle.normalizePath = original;
+            done();
+          });
+      });
+  });
+
   it('Koa: metrics returns up=1', done => {
     const app = koa();
     const bundled = bundle({

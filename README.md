@@ -55,13 +55,34 @@ See the example below.
 
 The goal is to have separate latency statistics by URL path, e.g. `/my-app/user/`, `/products/by-category` etc.
 
-Just taking `req.path` as a label value won't work as IDs are often part of the URL, like `/user/12352/profile`. So what we actually need is a path template. The module tries to figure out what parts of the path are values or IDs, and what is an actual path. The example mentioned before would be normalized to `/user/#val/profile` and that will become the value for the label.
+Just taking `req.path` as a label value won't work as IDs are often part of the URL,
+like `/user/12352/profile`. So what we actually need is a path template.
+The module tries to figure out what parts of the path are values or IDs,
+and what is an actual path. The example mentioned before would be
+normalized to `/user/#val/profile` and that will become the value for the label.
 
-You can override this magical behavior and define your own function by providing an optional callback using **normalizePath** option.
+You can override this magical behavior and define your own function by
+providing an optional callback using **normalizePath** option.
+You can also replace the default **normalizePath** function globally.
+This is handy if the rest of the middleware is done elsewhere
+e.g. via `kraken.js meddleware`.
+
+```javascript
+app.use(promBundle(/* options? */));
+
+// let's reuse the existing one and just add some
+// functionality on top
+const originalNormalize = promBunle.normalizePath;
+promBunle.normalizePath = (req, opts) => {
+  const path = originalNormalize(req, opts);
+  // count all docs (no matter which file) as a single path
+  return path.match(/^\/docs/) ? '/docs/*' : path;
+};
+```
 
 For more details:
  * [url-value-parser](https://www.npmjs.com/package/url-value-parser) - magic behind automatic path normalization
- * [normalizePath.js](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/src/normalizePath.js) - source code for path processing, for you
+ * [normalizePath.js](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/src/normalizePath.js) - source code for path processing
 
 
 
@@ -107,7 +128,7 @@ app.use(/* your middleware */);
 app.listen(3000);
 ```
 
-## Using together with kraken.js
+## using with kraken.js
 
 Here is meddleware config sample, which can be used in a standard **kraken.js** application:
 

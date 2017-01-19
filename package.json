@@ -7,7 +7,8 @@
     "prometheus",
     "metrics",
     "express",
-    "bundle"
+    "path",
+    "method"
   ],
   "scripts": {
     "test": "node_modules/jasme/run.js"
