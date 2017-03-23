@@ -2,6 +2,7 @@
 const onFinished = require('on-finished');
 const promClient = require('prom-client');
 const normalizePath = require('./normalizePath');
+const normalizeStatusCode = require('./normalizeStatusCode')
 
 function matchVsRegExps(element, regexps) {
   for (let regexp of regexps) {
@@ -116,7 +117,12 @@ function main(opts) {
       labels = {'status_code': 0};
       let timer = metrics[httpMtricName].startTimer(labels);
       onFinished(res, () => {
-        labels.status_code = res.statusCode;
+        if (opts.normalizeStatusCode) {
+          labels.status_code = main.normalizeStatusCode(req, opts);
+        } else {
+          labels.status_code = res.statusCode;
+        }
+
         if (opts.includeMethod) {
           labels.method = req.method;
         }
@@ -139,4 +145,5 @@ function main(opts) {
 
 main.promClient = promClient;
 main.normalizePath = normalizePath;
+main.normalizeStatusCode = normalizeStatusCode;
 module.exports = main;

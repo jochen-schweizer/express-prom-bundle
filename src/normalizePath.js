@@ -24,4 +24,3 @@ module.exports = function(req, opts) {
   }
   return urlValueParser.replacePathValues(path);
 };
-
