@@ -118,7 +118,7 @@ function main(opts) {
       let timer = metrics[httpMtricName].startTimer(labels);
       onFinished(res, () => {
         if (opts.normalizeStatusCode) {
-          labels.status_code = main.normalizeStatusCode(req, opts);
+          labels.status_code = main.normalizeStatusCode(res, opts);
         } else {
           labels.status_code = res.statusCode;
         }
