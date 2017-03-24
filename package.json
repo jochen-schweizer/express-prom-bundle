@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "on-finished": "^2.3.0",
-    "prom-client": "^6.3.0",
+    "prom-client": "^7.2.0",
     "url-value-parser": "^1.0.0"
   },
   "devDependencies": {
