@@ -2,7 +2,7 @@
 const onFinished = require('on-finished');
 const promClient = require('prom-client');
 const normalizePath = require('./normalizePath');
-const normalizeStatusCode = require('./normalizeStatusCode')
+const normalizeStatusCode = require('./normalizeStatusCode');
 
 function matchVsRegExps(element, regexps) {
   for (let regexp of regexps) {
