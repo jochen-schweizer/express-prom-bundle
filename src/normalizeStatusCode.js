@@ -10,5 +10,5 @@ module.exports = function(res, opts) {
     return opts.formatStatusCode(res, opts);
   }
 
-  return req.status_code;
+  return res.status_code;
 };
