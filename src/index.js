@@ -3,6 +3,7 @@ const onFinished = require('on-finished');
 const promClient = require('prom-client');
 const normalizePath = require('./normalizePath');
 const normalizeStatusCode = require('./normalizeStatusCode');
+const gcMetrics = require('./gcMetrics');
 
 function matchVsRegExps(element, regexps) {
   for (let regexp of regexps) {
@@ -36,39 +37,6 @@ function prepareMetricNames(opts, metricTemplates) {
     return names.filter(name => blacklisted.indexOf(name) === -1);
   }
   return names;
-}
-
-function gcMetrics() {
-  const optional = require('optional');
-  const gc = optional('gc-stats');
-  const gcTypes = {
-    0: 'Unknown',
-    1: 'Scavenge',
-    2: 'MarkSweepCompact',
-    3: 'ScavengeAndMarkSweepCompact',
-    4: 'IncrementalMarking',
-    8: 'WeakPhantom',
-    15: 'All',
-  };
-
-  const gcCount = new promClient.Counter('nodejs_gc_runs_total', 'Count of total garbage collections.', ['gctype']);
-  const gcTimeCount = new promClient.Counter('nodejs_gc_pause_seconds_total', 'Time spent in GC Pause in seconds.', ['gctype']);
-  const gcReclaimedCount = new promClient.Counter('nodejs_gc_reclaimed_bytes_total', 'Total number of bytes reclaimed by GC.', [
-    'gctype',
-  ]);
-
-  if (typeof gc === 'function') {
-    gc().on('stats', stats => {
-      const gcType = gcTypes[stats.gctype];
-
-      gcCount.labels(gcType).inc();
-      gcTimeCount.labels(gcType).inc(stats.pause / 1e9);
-
-      if (stats.diff.usedHeapSize < 0) {
-        gcReclaimedCount.labels(gcType).inc(stats.diff.usedHeapSize * -1);
-      }
-    });
-  }
 }
 
 function main(opts) {
@@ -125,7 +93,9 @@ function main(opts) {
     metrics[name] = metricTemplates[name]();
   }
 
-  gcMetrics();
+  if (opts.enableGcMetrics) {
+    gcMetrics(promClient, opts);
+  }
 
   if (metrics.up) {
     metrics.up.set(1);
