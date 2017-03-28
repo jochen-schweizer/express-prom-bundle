@@ -1,3 +1,5 @@
+'use strict';
+
 const optional = require('optional');
 const gc = optional('gc-stats');
 
