@@ -23,14 +23,19 @@ module.exports = function(promClient, opts = {}) {
     'gctype',
   ]);
 
-  gc().on('stats', stats => {
-    const gcType = gcTypes[stats.gctype];
+  let started = false;
 
-    gcCount.labels(gcType).inc();
-    gcTimeCount.labels(gcType).inc(stats.pause / 1e9);
+  if (started !== true) {
+    started = true;
+    gc().on('stats', stats => {
+      const gcType = gcTypes[stats.gctype];
 
-    if (stats.diff.usedHeapSize < 0) {
-      gcReclaimedCount.labels(gcType).inc(stats.diff.usedHeapSize * -1);
-    }
-  });
+      gcCount.labels(gcType).inc();
+      gcTimeCount.labels(gcType).inc(stats.pause / 1e9);
+
+      if (stats.diff.usedHeapSize < 0) {
+        gcReclaimedCount.labels(gcType).inc(stats.diff.usedHeapSize * -1);
+      }
+    });
+  }
 }
