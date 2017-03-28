@@ -1,7 +1,8 @@
 const optional = require('optional');
 const gc = optional('gc-stats');
 
-module.exports = function(promClient, opts = {}) {
+module.exports = function(promClient, opts) {
+  opts = opts || {};
 
   if (typeof gc !== 'function') {
     return;
