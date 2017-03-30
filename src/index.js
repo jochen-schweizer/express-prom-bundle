@@ -3,7 +3,7 @@ const onFinished = require('on-finished');
 const promClient = require('prom-client');
 const normalizePath = require('./normalizePath');
 const normalizeStatusCode = require('./normalizeStatusCode');
-import startGCStats from 'prometheus-gc-stats';
+const startGCStats = require('prometheus-gc-stats');
 
 function matchVsRegExps(element, regexps) {
   for (let regexp of regexps) {
