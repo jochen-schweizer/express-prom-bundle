@@ -3,6 +3,7 @@ const onFinished = require('on-finished');
 const promClient = require('prom-client');
 const normalizePath = require('./normalizePath');
 const normalizeStatusCode = require('./normalizeStatusCode');
+const startGCStats = require('prometheus-gc-stats');
 
 function matchVsRegExps(element, regexps) {
   for (let regexp of regexps) {
@@ -90,6 +91,11 @@ function main(opts) {
 
   for (let name of names) {
     metrics[name] = metricTemplates[name]();
+  }
+
+  if (opts.enableGcMetrics) {
+    const promTrackGC = startGCStats();
+    promTrackGC();
   }
 
   if (metrics.up) {

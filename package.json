@@ -18,6 +18,7 @@
   "dependencies": {
     "on-finished": "^2.3.0",
     "prom-client": "^6.3.0",
+    "prometheus-gc-stats": "^0.3.2",
     "url-value-parser": "^1.0.0"
   },
   "devDependencies": {
