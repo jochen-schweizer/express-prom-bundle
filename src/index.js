@@ -58,7 +58,8 @@ function main(opts) {
     );
   }
 
-  const httpMtricName = opts.httpDurationMetricName || 'http_request_duration_seconds';
+  const kDefaultHttpMetricName = 'http_request_duration_seconds';
+  const httpMtricName = opts.httpDurationMetricName || kDefaultHttpMetricName;
 
   const metricTemplates = {
     'up': () => new promClient.Gauge(
@@ -84,6 +85,13 @@ function main(opts) {
       return metric;
     }
   };
+
+  // Rename the 'http_request_duration_seconds' key in metricTemplates
+  // if the user provided a different value
+  if (httpMtricName != kDefaultHttpMetricName) {
+    metricTemplates[httpMtricName] = metricTemplates[kDefaultHttpMetricName];
+    delete metricTemplates[kDefaultHttpMetricName];
+  }
 
   const metrics = {};
   const names = prepareMetricNames(opts, metricTemplates);
