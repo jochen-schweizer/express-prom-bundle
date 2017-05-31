@@ -10,7 +10,7 @@ module.exports = function(req, opts) {
   // originalUrl is taken, because url and path can be changed
   // by middlewares such as 'router'. Note: this function is called onFinish
   /// i.e. always in the tail of the middleware chain
-  const path = url.parse(req.originalUrl).pathname;
+  const path = url.parse(req.originalUrl || req.url).pathname;
 
   if (opts.normalizePath !== undefined && !opts.normalizePath) {
     return path;

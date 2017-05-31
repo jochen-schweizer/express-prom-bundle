@@ -4,11 +4,6 @@ const express = require('express');
 const app = express();
 const promBundle = require('express-prom-bundle');
 
-// here we want to remove default metrics provided in prom-client
-// this must be done before initializing promBundle
-clearInterval(promBundle.promClient.defaultMetrics());
-promBundle.promClient.register.clear();
-
 const bundle = promBundle({
   blacklist: [/up/],
   buckets: [0.1, 0.4, 0.7],

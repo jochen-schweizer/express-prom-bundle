@@ -102,7 +102,7 @@ function main(opts) {
   };
 
   const middleware = function (req, res, next) {
-    const path = req.originalUrl;
+    const path = req.originalUrl || req.url; // originalUrl gets lost in koa-connect?
     let labels;
 
     if (opts.autoregister && path.match(/^\/metrics\/?$/)) {

@@ -1,6 +1,6 @@
 {
   "name": "express-prom-bundle",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "express middleware with popular prometheus metrics in one bundle",
   "main": "src/index.js",
   "keywords": [
@@ -17,18 +17,18 @@
   "license": "MIT",
   "dependencies": {
     "on-finished": "^2.3.0",
-    "prom-client": "^6.3.0",
+    "prom-client": "^9.0.0",
     "url-value-parser": "^1.0.0"
   },
   "devDependencies": {
-    "coveralls": "^2.11.15",
-    "eslint": "^3.11.1",
-    "express": "^4.14.0",
+    "coveralls": "^2.13.1",
+    "eslint": "^3.19.0",
+    "express": "^4.15.3",
     "istanbul": "^0.4.5",
     "jasme": "^5.2.0",
-    "koa": "^1.2.4",
-    "koa-connect": "^1.0.0",
-    "supertest": "^2.0.1",
+    "koa": "^2.2.0",
+    "koa-connect": "^2.0.0",
+    "supertest": "^3.0.0",
     "supertest-koa-agent": "^0.3.0"
   },
   "repository": {

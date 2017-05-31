@@ -4,7 +4,7 @@
 const express = require('express');
 const supertest = require('supertest');
 const bundle = require('../');
-const koa = require('koa');
+const Koa = require('koa');
 const c2k = require('koa-connect');
 const supertestKoa = require('supertest-koa-agent');
 const promClient = require('prom-client');
@@ -194,17 +194,14 @@ describe('index', () => {
   });
 
   it('Koa: metrics returns up=1', done => {
-    const app = koa();
+    const app = new Koa();
     const bundled = bundle({
       whitelist: ['up']
     });
     app.use(c2k(bundled));
 
-    app.use(function*(next) {
-      if (this.path !== 'test') {
-        return yield next;
-      }
-      this.body = 'it worked';
+    app.use(function(ctx, next) {
+      return next().then(() => ctx.body = 'it worked');
     });
 
     const agent = supertestKoa(app);

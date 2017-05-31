@@ -2,7 +2,7 @@
 
 # express prometheus bundle
 
-Express middleware with popular prometheus metrics in one bundle. It's also compatible with koa v1 (see below).
+Express middleware with popular prometheus metrics in one bundle. It's also compatible with koa v1 and v2 (see below).
 
 Internally it uses **prom-client**. See: https://github.com/siimon/prom-client
 
@@ -116,15 +116,15 @@ app.listen(3000);
 
 See an [advanced example on github](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
 
-## koa v1 example
+## koa v2 example
 
 ```javascript
 const promBundle = require("express-prom-bundle");
-const koa = require("koa");
+const Koa = require("koa");
 const c2k = require("koa-connect");
 const metricsMiddleware = promBundle({/* options */ });
 
-const app = koa();
+const app = new Koa();
 
 app.use(c2k(metricsMiddleware));
 app.use(/* your middleware */);
@@ -157,8 +157,11 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
 
 ## Changelog
 
+ * **3.0.0**
+    * upgrade dependencies, most notably **prom-client** to 9.0.0
+    * switch to koa v2 in koa unittest
  * **2.1.0**
-    * deprecate **excludeRoutes**, use **req.originalPath** instead of **req.path**
+    * deprecate **excludeRoutes**, use **req.originalUrl** instead of **req.path**
  * **2.0.0**
     * the reason for the version lift were:
       * compliance to official naming recommendation: https://prometheus.io/docs/practices/naming/
