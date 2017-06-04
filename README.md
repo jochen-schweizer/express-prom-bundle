@@ -4,14 +4,12 @@
 
 Express middleware with popular prometheus metrics in one bundle. It's also compatible with koa v1 and v2 (see below).
 
-Internally it uses **prom-client**. See: https://github.com/siimon/prom-client
+Internally it uses **prom-client**. See: https://github.com/siimon/prom-client (^9.0.0)
 
 Included metrics:
 
 * `up`: normally is just 1
 * `http_request_duration_seconds`: http latency histogram labeled with `status_code`, `method` and `path`
-
-**Please note version 2.x is NOT backwards compatible with 1.x**
 
 ## Install
 
@@ -19,12 +17,12 @@ Included metrics:
 npm install express-prom-bundle
 ```
 
-## Usage
+## Sample uUsage
 
 ```javascript
 const promBundle = require("express-prom-bundle");
-const metricsMiddleware = promBundle({/* options */ });
 const app = require("express")();
+const metricsMiddleware = promBundle({includeMethod: true});
 
 app.use(metricsMiddleware);
 app.use(/* your middleware */);
@@ -44,17 +42,31 @@ See the example below.
 
 ## Options
 
-* **buckets**: buckets used for `http_request_seconds` histogram
-* **includeMethod**: include HTTP method (GET, PUT, ...) as a label to `http_request_duration_seconds`
-* **includePath**: include URL path as a label (see below)
-* **normalizePath**: boolean or `function(req)` - path normalization for `includePath` option
+Which labels to include in `http_request_duration_seconds` metric:
+
+* **includeStatusCode**: HTTP status code (200, 400, 404 etc.), default: **true**
+* **includeMethod**: HTTP method (GET, PUT, ...), default: **false**
+* **includePath**: URL path (see importent details below), default: **false**
+
+Extra transformation callbacks:
+
+* **normalizePath**: `function(req)` generates path values from express `req` (see details below)
+* **formatStatusCode**: `function(res)` producing final status code from express `res` object, e.g. you can combine `200`, `201` and `204` to just `2xx`.
+
+Other options:
+
+* **buckets**: buckets used for `http_request_duration_seconds` histogram
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
-* **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude
-* **excludeRoutes**: (deprecated) array of strings or regexp specifying which routes should be skipped for `http_request_duration_seconds` metric. It uses `req.originalUrl` as subject when checking. You want normally use express or meddleware features instead of this options.
+
+Deprecated:
+
+* **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude (there are only 2 metrics)
+* **excludeRoutes**: array of strings or regexp specifying which routes should be skipped for `http_request_duration_seconds` metric. It uses `req.originalUrl` as subject when checking. You want to use express or meddleware features instead of this option.
 
 ### More details on includePath option
 
-The goal is to have separate latency statistics by URL path, e.g. `/my-app/user/`, `/products/by-category` etc.
+Let's say you want to have  latency statistics by URL path,
+e.g. separate metrics for `/my-app/user/`, `/products/by-category` etc.
 
 Just taking `req.path` as a label value won't work as IDs are often part of the URL,
 like `/user/12352/profile`. So what we actually need is a path template.
@@ -65,8 +77,6 @@ normalized to `/user/#val/profile` and that will become the value for the label.
 You can override this magical behavior and define your own function by
 providing an optional callback using **normalizePath** option.
 You can also replace the default **normalizePath** function globally.
-This is handy if the rest of the middleware is done elsewhere
-e.g. via `kraken.js meddleware`.
 
 ```javascript
 app.use(promBundle(/* options? */));
@@ -160,7 +170,9 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
  * **3.0.0**
     * upgrade dependencies, most notably **prom-client** to 9.0.0
     * switch to koa v2 in koa unittest
-    * only node v6 is supported (stop supporting node v4 and v5)
+    * only node v6 or higher is supported (stop supporting node v4 and v5)
+    * switch to npm5 and use package-lock.json
+    * options added: includeStatusCode, formatStatusCode
  * **2.1.0**
     * deprecate **excludeRoutes**, use **req.originalUrl** instead of **req.path**
  * **2.0.0**

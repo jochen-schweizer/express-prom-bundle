@@ -169,7 +169,7 @@ describe('index', () => {
       });
   });
 
-  it('normalizePath can be replaced', done => {
+  it('normalizePath can be replaced gloablly', done => {
     const app = express();
     const original = bundle.normalizePath;
     bundle.normalizePath = () => 'dummy';
@@ -188,6 +188,70 @@ describe('index', () => {
             expect(res.status).toBe(200);
             expect(res.text).toMatch(/"dummy"/m);
             bundle.normalizePath = original;
+            done();
+          });
+      });
+  });
+
+  it('normalizePath can be overridden', done => {
+    const app = express();
+    const instance = bundle({
+      includePath: true,
+      normalizePath: req => req.originalUrl + '-suffixed'
+    });
+    app.use(instance);
+    app.use('/test', (req, res) => res.send('it worked'));
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/"\/test-suffixed"/m);
+            done();
+          });
+      });
+  });
+
+  it('formatStatusCode can be overridden', done => {
+    const app = express();
+    const instance = bundle({
+      formatStatusCode: () => 555
+    });
+    app.use(instance);
+    app.use('/test', (req, res) => res.send('it worked'));
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/555/);
+            done();
+          });
+      });
+  });
+
+  it('includeStatusCode=false removes status_code label from metrics', done => {
+    const app = express();
+    const instance = bundle({
+      includeStatusCode: false
+    });
+    app.use(instance);
+    app.use('/test', (req, res) => res.send('it worked'));
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).not.toMatch(/200/);
             done();
           });
       });

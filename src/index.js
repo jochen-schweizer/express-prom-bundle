@@ -39,7 +39,15 @@ function prepareMetricNames(opts, metricTemplates) {
 }
 
 function main(opts) {
-  opts = Object.assign({autoregister: true}, opts);
+  opts = Object.assign(
+    {
+      autoregister: true,
+      includeStatusCode: true,
+      normalizePath: main.normalizePath,
+      formatStatusCode: main.normalizeStatusCode
+    },
+    opts
+  );
   if (arguments[2] && arguments[1] && arguments[1].send) {
     arguments[1].status(500)
       .send('<h1>500 Error</h1>\n'
@@ -114,20 +122,17 @@ function main(opts) {
     }
 
     if (metrics[httpMtricName]) {
-      labels = {'status_code': 0};
+      labels = {};
       let timer = metrics[httpMtricName].startTimer(labels);
       onFinished(res, () => {
-        if (opts.normalizeStatusCode) {
-          labels.status_code = main.normalizeStatusCode(res, opts);
-        } else {
-          labels.status_code = res.statusCode;
+        if (opts.includeStatusCode) {
+          labels.status_code = opts.formatStatusCode(res, opts);
         }
-
         if (opts.includeMethod) {
           labels.method = req.method;
         }
         if (opts.includePath) {
-          labels.path = main.normalizePath(req, opts);
+          labels.path = opts.normalizePath(req, opts);
         }
         timer();
       });
