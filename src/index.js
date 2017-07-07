@@ -81,13 +81,11 @@ function main(opts) {
       if (opts.includePath) {
         labels.push('path');
       }
-      const metric = new promClient.Histogram(
-        httpMtricName,
-        'duration histogram of http responses labeled with: ' + labels.join(', '),
-        labels,
-        {
-          buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
-        }
+      const metric = new promClient.Histogram({
+        name: httpMtricName,
+        help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
+        labelNames: labels,
+        buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
       );
       return metric;
     }
