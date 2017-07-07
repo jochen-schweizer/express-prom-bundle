@@ -86,7 +86,7 @@ function main(opts) {
         help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
         labelNames: labels,
         buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
-      );
+      });
       return metric;
     }
   };
