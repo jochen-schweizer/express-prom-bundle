@@ -69,10 +69,10 @@ function main(opts) {
   const httpMtricName = opts.httpDurationMetricName || 'http_request_duration_seconds';
 
   const metricTemplates = {
-    'up': () => new promClient.Gauge(
-      'up',
-      '1 = up, 0 = not up'
-    ),
+    'up': () => new promClient.Gauge({
+      name: 'up',
+      help: '1 = up, 0 = not up'
+    }),
     'http_request_duration_seconds': () => {
       const labels = ['status_code'];
       if (opts.includeMethod) {
