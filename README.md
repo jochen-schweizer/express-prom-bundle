@@ -167,6 +167,8 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
 
 ## Changelog
 
+ * **3.1.0**
+    * upgrade **prom-client** to 10.0.0
  * **3.0.0**
     * upgrade dependencies, most notably **prom-client** to 9.0.0
     * switch to koa v2 in koa unittest
