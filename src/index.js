@@ -69,10 +69,10 @@ function main(opts) {
   const httpMtricName = opts.httpDurationMetricName || 'http_request_duration_seconds';
 
   const metricTemplates = {
-    'up': () => new promClient.Gauge(
-      'up',
-      '1 = up, 0 = not up'
-    ),
+    'up': () => new promClient.Gauge({
+      name: 'up',
+      help: '1 = up, 0 = not up'
+    }),
     'http_request_duration_seconds': () => {
       const labels = ['status_code'];
       if (opts.includeMethod) {
@@ -81,14 +81,12 @@ function main(opts) {
       if (opts.includePath) {
         labels.push('path');
       }
-      const metric = new promClient.Histogram(
-        httpMtricName,
-        'duration histogram of http responses labeled with: ' + labels.join(', '),
-        labels,
-        {
-          buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
-        }
-      );
+      const metric = new promClient.Histogram({
+        name: httpMtricName,
+        help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
+        labelNames: labels,
+        buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
+      });
       return metric;
     }
   };
