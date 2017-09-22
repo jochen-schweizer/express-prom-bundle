@@ -38,6 +38,30 @@ function prepareMetricNames(opts, metricTemplates) {
   return names;
 }
 
+function hasCustomLabels(opts, strict){
+  strict = strict || false;
+  if( opts.hasOwnProperty('includeCustomLabels') ){
+    let dtype;
+    try {
+      dtype = opts.includeCustomLabels.constructor.name;
+    }catch(e){
+      dtype = opts.includeCustomLabels;
+    }
+    if( dtype === 'Object' ){
+      return true;
+    }
+    if( strict ){
+      throw new Error(
+        'express-prom-bundle detected invalid data type for option: includeCustomLabels.\n'
+        + 'Expected: Object\n'
+        + 'Passed: ' + dtype
+      );
+    }
+  }
+
+  return false;
+}
+
 function main(opts) {
   opts = Object.assign(
     {
@@ -80,6 +104,9 @@ function main(opts) {
       }
       if (opts.includePath) {
         labels.push('path');
+      }
+      if (hasCustomLabels(opts, true)){
+        labels.push.apply(labels, Object.keys(opts.includeCustomLabels));
       }
       const metric = new promClient.Histogram({
         name: httpMtricName,
@@ -131,6 +158,12 @@ function main(opts) {
         }
         if (opts.includePath) {
           labels.path = opts.normalizePath(req, opts);
+        }
+        if (hasCustomLabels(opts, true)) {
+          let customLabels = opts.includeCustomLabels;
+          for(var key in customLabels){
+            labels[key] = customLabels[key];
+          }
         }
         timer();
       });

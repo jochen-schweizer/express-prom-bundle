@@ -148,11 +148,12 @@ describe('index', () => {
     expect(() => bundle({prefix: 'hello'})).toThrow();
   });
 
-  it('tolerates includePath, includeMethod', done => {
+  it('tolerates includePath, includeMethod, includeCustomLabels', done => {
     const app = express();
     const instance = bundle({
       includePath: true,
-      includeMethod: true
+      includeMethod: true,
+      includeCustomLabels: {foo: 'bar'}
     });
     app.use(instance);
     app.use('/test', (req, res) => res.send('it worked'));
@@ -252,6 +253,27 @@ describe('index', () => {
           .end((err, res) => {
             expect(res.status).toBe(200);
             expect(res.text).not.toMatch(/200/);
+            done();
+          });
+      });
+  });
+
+  it('includeCustomLabels={foo: "bar"} adds foo="bar" label to metrics', done => {
+    const app = express();
+    const instance = bundle({
+      includeCustomLabels: {foo: "bar"}
+    });
+    app.use(instance);
+    app.use('/test', (req, res) => res.send('it worked'));
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/foo="bar"/);
             done();
           });
       });
