@@ -8,7 +8,9 @@ const bundle = promBundle({
   blacklist: [/up/],
   buckets: [0.1, 0.4, 0.7],
   includeMethod: true,
-  includePath: true
+  includePath: true,
+  customLabels: {year: null},
+  transformLabels: labels => Object.assign(labels, {year: new Date().getFullYear()})
 });
 
 app.use(bundle);
