@@ -258,10 +258,10 @@ describe('index', () => {
       });
   });
 
-  it('includeCustomLabels={foo: "bar"} adds foo="bar" label to metrics', done => {
+  it('customLabels={foo: "bar"} adds foo="bar" label to metrics', done => {
     const app = express();
     const instance = bundle({
-      includeCustomLabels: {foo: "bar"}
+      customLabels: {foo: 'bar'}
     });
     app.use(instance);
     app.use('/test', (req, res) => res.send('it worked'));
@@ -274,6 +274,33 @@ describe('index', () => {
           .end((err, res) => {
             expect(res.status).toBe(200);
             expect(res.text).toMatch(/foo="bar"/);
+            done();
+          });
+      });
+  });
+
+  it('tarnsformLabels can set label values', done => {
+    const app = express();
+    const instance = bundle({
+      includePath: true,
+      customLabels: {foo: 'bar'},
+      transformLabels: labels => {
+        labels.foo = 'baz';
+        labels.path += '/ok';
+      }
+    });
+    app.use(instance);
+    app.use('/test', (req, res) => res.send('it worked'));
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/foo="baz"/);
+            expect(res.text).toMatch(/path="\/test\/ok"/);
             done();
           });
       });
