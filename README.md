@@ -17,7 +17,7 @@ Included metrics:
 npm install express-prom-bundle
 ```
 
-## Sample uUsage
+## Sample Usage
 
 ```javascript
 const promBundle = require("express-prom-bundle");
