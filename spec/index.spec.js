@@ -34,6 +34,21 @@ describe('index', () => {
     });
   });
 
+  it('httpDurationMetricName overrides histogram metric name', done => {
+    const app = express();
+    const bundled = bundle({
+      httpDurationMetricName: 'my_http_duration'
+    });
+    app.use(bundled);
+
+    const agent = supertest(app);
+    agent.get('/metrics')
+      .end((err, res) => {
+        expect(res.text).toMatch(/my_http_duration/m);
+        done();
+      });
+  });
+
   it('metrics should be attached to /metrics by default', done => {
     const app = express();
     const bundled = bundle({
