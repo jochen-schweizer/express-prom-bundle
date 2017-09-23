@@ -47,11 +47,14 @@ Which labels to include in `http_request_duration_seconds` metric:
 * **includeStatusCode**: HTTP status code (200, 400, 404 etc.), default: **true**
 * **includeMethod**: HTTP method (GET, PUT, ...), default: **false**
 * **includePath**: URL path (see importent details below), default: **false**
+* **customLabels**: an object containing extra labels, e.g. ```{project_name: 'hello_world'}```.
+  Most useful together with **transformLabels** callback, otherwise it's better to use native Prometheus relabeling.
 
 Extra transformation callbacks:
 
 * **normalizePath**: `function(req)` generates path values from express `req` (see details below)
 * **formatStatusCode**: `function(res)` producing final status code from express `res` object, e.g. you can combine `200`, `201` and `204` to just `2xx`.
+* **transformLabels**: `function(labels, req, res)` transforms the **labels** object, e.g. setting dynamic values to **customLabels**
 
 Other options:
 
@@ -62,6 +65,7 @@ Deprecated:
 
 * **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude (there are only 2 metrics)
 * **excludeRoutes**: array of strings or regexp specifying which routes should be skipped for `http_request_duration_seconds` metric. It uses `req.originalUrl` as subject when checking. You want to use express or meddleware features instead of this option.
+* **httpDurationMetricName**: name of the request duration histogram metric. (Default: `http_request_duration_seconds`)
 
 ### More details on includePath option
 
@@ -167,6 +171,8 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
 
 ## Changelog
 
+ * **3.2.0**
+    * added options **customLabels**, **transformLabels**
  * **3.1.0**
     * upgrade **prom-client** to 10.0.0
  * **3.0.0**
