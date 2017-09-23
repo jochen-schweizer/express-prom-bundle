@@ -40,17 +40,17 @@ function prepareMetricNames(opts, metricTemplates) {
 
 function hasCustomLabels(opts, strict){
   strict = strict || false;
-  if( opts.hasOwnProperty('includeCustomLabels') ){
+  if (opts.hasOwnProperty('includeCustomLabels')){
     let dtype;
     try {
       dtype = opts.includeCustomLabels.constructor.name;
-    }catch(e){
+    } catch (e) {
       dtype = opts.includeCustomLabels;
     }
-    if( dtype === 'Object' ){
+    if (dtype === 'Object') {
       return true;
     }
-    if( strict ){
+    if (strict) {
       throw new Error(
         'express-prom-bundle detected invalid data type for option: includeCustomLabels.\n'
         + 'Expected: Object\n'
@@ -161,7 +161,7 @@ function main(opts) {
         }
         if (hasCustomLabels(opts, true)) {
           let customLabels = opts.includeCustomLabels;
-          for(var key in customLabels){
+          for (let key in customLabels){
             labels[key] = customLabels[key];
           }
         }
