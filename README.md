@@ -173,6 +173,7 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
 
  * **3.2.0**
     * added options **customLabels**, **transformLabels**
+    * upgrade **prom-client** to 10.1.0
  * **3.1.0**
     * upgrade **prom-client** to 10.0.0
  * **3.0.0**
