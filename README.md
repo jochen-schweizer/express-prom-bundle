@@ -4,7 +4,7 @@
 
 Express middleware with popular prometheus metrics in one bundle. It's also compatible with koa v1 and v2 (see below).
 
-Internally it uses **prom-client**. See: https://github.com/siimon/prom-client (^9.0.0)
+Internally it uses **prom-client**. See: https://github.com/siimon/prom-client
 
 Included metrics:
 
