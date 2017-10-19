@@ -87,8 +87,8 @@ app.use(promBundle(/* options? */));
 
 // let's reuse the existing one and just add some
 // functionality on top
-const originalNormalize = promBunle.normalizePath;
-promBunle.normalizePath = (req, opts) => {
+const originalNormalize = promBundle.normalizePath;
+promBundle.normalizePath = (req, opts) => {
   const path = originalNormalize(req, opts);
   // count all docs (no matter which file) as a single path
   return path.match(/^\/docs/) ? '/docs/*' : path;
