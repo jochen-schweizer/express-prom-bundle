@@ -44,7 +44,8 @@ function main(opts) {
       autoregister: true,
       includeStatusCode: true,
       normalizePath: main.normalizePath,
-      formatStatusCode: main.normalizeStatusCode
+      formatStatusCode: main.normalizeStatusCode,
+      promClient: {}
     },
     opts
   );
@@ -64,6 +65,10 @@ function main(opts) {
       + 'Please refer to oficial docs. '
       + 'Most likely you upgraded the module without necessary code changes'
     );
+  }
+
+  if (opts.promClient.collectDefaultMetrics) {
+    promClient.collectDefaultMetrics(opts.promClient.collectDefaultMetrics);
   }
 
   const httpMetricName = opts.httpDurationMetricName || 'http_request_duration_seconds';

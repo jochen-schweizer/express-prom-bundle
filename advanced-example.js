@@ -10,13 +10,18 @@ const bundle = promBundle({
   includeMethod: true,
   includePath: true,
   customLabels: {year: null},
-  transformLabels: labels => Object.assign(labels, {year: new Date().getFullYear()})
+  transformLabels: labels => Object.assign(labels, {year: new Date().getFullYear()}),
+  promClient: {
+    collectDefaultMetrics: {
+      timeout: 1000
+    }
+  }
 });
 
 app.use(bundle);
 
 // native prom-client metric (no prefix)
-const c1 = new bundle.promClient.Counter('c1', 'c1 help');
+const c1 = new bundle.promClient.Counter({name: 'c1', help: 'c1 help'});
 c1.inc(10);
 
 app.get('/foo/:id', (req, res) => {

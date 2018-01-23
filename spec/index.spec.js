@@ -343,4 +343,16 @@ describe('index', () => {
         });
     });
   });
+
+  it('calls promClient.collectDefaultMetrics', () => {
+    const spy = spyOn(promClient, 'collectDefaultMetrics');
+    bundle({
+      promClient: {
+        collectDefaultMetrics: {
+          timeout: 3000
+        }
+      }
+    });
+    expect(spy).toHaveBeenCalledWith({timeout: 3000});
+  });
 });

@@ -60,6 +60,9 @@ Other options:
 
 * **buckets**: buckets used for `http_request_duration_seconds` histogram
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
+* **promClient**: options for promClient startup, e.g. **collectDefaultMetrics**. This option was added
+  to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
+  see [advanced example](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
 
 Deprecated:
 
@@ -171,19 +174,32 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
 
 ## Changelog
 
+ * **3.3.0**
+    * added option **promClient** to be able to call collectDefaultMetrics
+    * upgrade **prom-client** to ~10.2.2 (switch to semver "approximately")
+
+
  * **3.2.0**
     * added options **customLabels**, **transformLabels**
     * upgrade **prom-client** to 10.1.0
+
+
  * **3.1.0**
     * upgrade **prom-client** to 10.0.0
+
+
  * **3.0.0**
     * upgrade dependencies, most notably **prom-client** to 9.0.0
     * switch to koa v2 in koa unittest
     * only node v6 or higher is supported (stop supporting node v4 and v5)
     * switch to npm5 and use package-lock.json
     * options added: includeStatusCode, formatStatusCode
+
+
  * **2.1.0**
     * deprecate **excludeRoutes**, use **req.originalUrl** instead of **req.path**
+
+
  * **2.0.0**
     * the reason for the version lift were:
       * compliance to official naming recommendation: https://prometheus.io/docs/practices/naming/
