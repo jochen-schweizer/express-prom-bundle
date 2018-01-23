@@ -267,7 +267,7 @@ describe('index', () => {
           .get('/metrics')
           .end((err, res) => {
             expect(res.status).toBe(200);
-            expect(res.text).not.toMatch(/200/);
+            expect(res.text).not.toMatch(/="200"/);
             done();
           });
       });
