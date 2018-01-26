@@ -163,7 +163,12 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
         "arguments": [
           {
             "includeMethod": true,
-            "buckets": [0.1, 1, 5]
+            "buckets": [0.1, 1, 5],
+            "promClient": {
+              "collectDefaultMetrics": {
+                "timeout": 2000
+              }
+            }
           }
         ]
       }
