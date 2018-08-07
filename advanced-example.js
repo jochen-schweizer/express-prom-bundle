@@ -15,6 +15,8 @@ const bundle = promBundle({
     collectDefaultMetrics: {
       timeout: 1000
     }
+  },
+  urlValueParser: {
   }
 });
 
