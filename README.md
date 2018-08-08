@@ -52,6 +52,9 @@ Which labels to include in `http_request_duration_seconds` metric:
 
 Extra transformation callbacks:
 
+* **urlValueParser**: options passed when instantiating [url-value-parser](https://github.com/disjunction/url-value-parser).
+  This is the easiest way to customize which parts of the URL should be replaced with "#val".
+  See the [docs](https://github.com/disjunction/url-value-parser) of url-value-parser module for details.
 * **normalizePath**: `function(req)` generates path values from express `req` (see details below)
 * **formatStatusCode**: `function(res)` producing final status code from express `res` object, e.g. you can combine `200`, `201` and `204` to just `2xx`.
 * **transformLabels**: `function(labels, req, res)` transforms the **labels** object, e.g. setting dynamic values to **customLabels**
@@ -150,7 +153,9 @@ app.listen(3000);
 
 ## using with kraken.js
 
-Here is meddleware config sample, which can be used in a standard **kraken.js** application:
+Here is meddleware config sample, which can be used in a standard **kraken.js** application.
+In this case the stats for URI paths and HTTP methods are collected separately,
+while replacing all HEX values starting from 5 characters and all emails in the path as #val.
 
 ```json
 {
@@ -163,11 +168,18 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
         "arguments": [
           {
             "includeMethod": true,
+            "includePath": true,
             "buckets": [0.1, 1, 5],
             "promClient": {
               "collectDefaultMetrics": {
                 "timeout": 2000
               }
+            },
+            "urlValueParser": {
+              "minHexLength": 5,
+              "extraMasks": [
+                "^[^@]+@[^@]+\\.[^@]+$"
+              ]
             }
           }
         ]
@@ -178,6 +190,10 @@ Here is meddleware config sample, which can be used in a standard **kraken.js** 
 ```
 
 ## Changelog
+
+* **4.0.0**
+    * added option **urlValueParser**
+    * upgrade **prom-client** to ~11.1.1
 
  * **3.3.0**
     * added option **promClient** to be able to call collectDefaultMetrics

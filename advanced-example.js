@@ -17,6 +17,10 @@ const bundle = promBundle({
     }
   },
   urlValueParser: {
+    minHexLength: 5,
+    extraMasks: [
+      "^[^@]+@[^@]+\\.[^@]+$"
+    ]
   }
 });
 
@@ -42,6 +46,7 @@ app.listen(3000, () => console.info(  // eslint-disable-line
   'listening on 3000\n'
   + 'test in shell console\n\n'
   + 'curl localhost:3000/foo/1234\n'
+  + 'curl localhost:3000/foo/john%40example.com\n'
   + 'curl -X DELETE localhost:3000/foo/5432\n'
   + 'curl localhost:3000/bar\n'
   + 'curl localhost:3000/metrics\n'
