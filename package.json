@@ -17,15 +17,16 @@
   "license": "MIT",
   "dependencies": {
     "on-finished": "^2.3.0",
-    "prom-client": "~11.1.1"
+    "prom-client": "~11.1.1",
+    "url-value-parser": "^2.0.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "eslint": "^3.19.0",
-    "express": "^4.15.3",
+    "eslint": "^5.3.0",
+    "express": "^4.16.3",
     "istanbul": "^0.4.5",
     "jasme": "^5.2.0",
-    "koa": "^2.2.0",
+    "koa": "^2.5.2",
     "koa-connect": "^2.0.0",
     "supertest": "^3.0.0",
     "supertest-koa-agent": "^0.3.0"
