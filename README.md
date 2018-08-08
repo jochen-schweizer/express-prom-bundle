@@ -189,54 +189,6 @@ while replacing all HEX values starting from 5 characters and all emails in the 
 }
 ```
 
-## Changelog
-
-* **4.0.0**
-    * added option **urlValueParser**
-    * upgrade **prom-client** to ~11.1.1
-
- * **3.3.0**
-    * added option **promClient** to be able to call collectDefaultMetrics
-    * upgrade **prom-client** to ~10.2.2 (switch to semver "approximately")
-
-
- * **3.2.0**
-    * added options **customLabels**, **transformLabels**
-    * upgrade **prom-client** to 10.1.0
-
-
- * **3.1.0**
-    * upgrade **prom-client** to 10.0.0
-
-
- * **3.0.0**
-    * upgrade dependencies, most notably **prom-client** to 9.0.0
-    * switch to koa v2 in koa unittest
-    * only node v6 or higher is supported (stop supporting node v4 and v5)
-    * switch to npm5 and use package-lock.json
-    * options added: includeStatusCode, formatStatusCode
-
-
- * **2.1.0**
-    * deprecate **excludeRoutes**, use **req.originalUrl** instead of **req.path**
-
-
- * **2.0.0**
-    * the reason for the version lift were:
-      * compliance to official naming recommendation: https://prometheus.io/docs/practices/naming/
-      * stopping promotion of an anti-pattern - see https://groups.google.com/d/msg/prometheus-developers/XjlOnDCK9qc/ovKzV3AIBwAJ
-      * dealing with **prom-client** being a singleton with a built-in registry
-    * main histogram metric renamed from `http_request_seconds` to `http_request_duration_seconds`
-    * options removed: **prefix**, **keepDefaultMetrics**
-    * factory removed (as the only reason of it was adding the prefix)
-    * upgrade prom-client to 6.3.0
-    * code style changed to the one closer to express
-
-
- * **1.2.1**
-    * upgrade prom-client to 6.1.2
-    * add options: includeMethod, includePath, keepDefaultMetrics
-
 ## License
 
 MIT
