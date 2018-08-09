@@ -138,7 +138,9 @@ function main(opts) {
           labels.method = req.method;
         }
         if (opts.includePath) {
-          labels.path = opts.normalizePath(req, opts);
+          labels.path = typeof opts.normalizePath == 'function'
+            ? opts.normalizePath(req, opts)
+            : main.normalizePath(req, opts);
         }
         if (opts.customLabels) {
           Object.assign(labels, opts.customLabels);

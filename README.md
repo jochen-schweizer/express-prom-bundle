@@ -52,10 +52,13 @@ Which labels to include in `http_request_duration_seconds` metric:
 
 Extra transformation callbacks:
 
+* **normalizePath**: `function(req)`  or `Array`
+  * if function is provided, then it should generate path value from express `req`
+  * if array is provided, then it should be an array of tuples `[regex, replacement]`. The `regex` can be a string and is automatically converted into JS regex.
+  * ... see more details in the section below
 * **urlValueParser**: options passed when instantiating [url-value-parser](https://github.com/disjunction/url-value-parser).
   This is the easiest way to customize which parts of the URL should be replaced with "#val".
   See the [docs](https://github.com/disjunction/url-value-parser) of url-value-parser module for details.
-* **normalizePath**: `function(req)` generates path values from express `req` (see details below)
 * **formatStatusCode**: `function(res)` producing final status code from express `res` object, e.g. you can combine `200`, `201` and `204` to just `2xx`.
 * **transformLabels**: `function(labels, req, res)` transforms the **labels** object, e.g. setting dynamic values to **customLabels**
 
@@ -67,12 +70,6 @@ Other options:
   to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
   see [advanced example](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
 
-Deprecated:
-
-* **whitelist**, **blacklist**: array of strings or regexp specifying which metrics to include/exclude (there are only 2 metrics)
-* **excludeRoutes**: array of strings or regexp specifying which routes should be skipped for `http_request_duration_seconds` metric. It uses `req.originalUrl` as subject when checking. You want to use express or meddleware features instead of this option.
-* **httpDurationMetricName**: name of the request duration histogram metric. (Default: `http_request_duration_seconds`)
-
 ### More details on includePath option
 
 Let's say you want to have  latency statistics by URL path,
@@ -83,10 +80,33 @@ like `/user/12352/profile`. So what we actually need is a path template.
 The module tries to figure out what parts of the path are values or IDs,
 and what is an actual path. The example mentioned before would be
 normalized to `/user/#val/profile` and that will become the value for the label.
+These conversions are handled by `normalizePath` function.
 
-You can override this magical behavior and define your own function by
-providing an optional callback using **normalizePath** option.
-You can also replace the default **normalizePath** function globally.
+You can extend this magical behavior by providing
+additional RegExp rules to be performed,
+or override `normalizePath` with your own function.
+
+#### Example 1 (add custom RegExp):
+
+```javascript
+app.use(promBundle({
+  normalizePath: [
+    // collect paths like "/customer/johnbobson" as just one "/custom/#name"
+    ['^/customer/.*', '/customer/#name'],
+
+    // collect paths like "/bobjohnson/order-list" as just one "/#name/order-list"
+    ['^.*/order-list', '/#name/order-list']
+  ],
+  urlValueParser: {
+    minHexLength: 5,
+    extraMasks: [
+      'ORD[0-9]{5,}' // replace strings like ORD1243423, ORD673562 as #val
+    ]
+  }
+}));
+```
+
+#### Example 2 (override normalizePath function):
 
 ```javascript
 app.use(promBundle(/* options? */));
@@ -96,15 +116,14 @@ app.use(promBundle(/* options? */));
 const originalNormalize = promBundle.normalizePath;
 promBundle.normalizePath = (req, opts) => {
   const path = originalNormalize(req, opts);
-  // count all docs (no matter which file) as a single path
-  return path.match(/^\/docs/) ? '/docs/*' : path;
+  // count all docs as one path, but /docs/login as a separate one
+  return (path.match(/^\/docs/) && !path.match(/^\/login/)) ? '/docs/*' : path;
 };
 ```
 
 For more details:
  * [url-value-parser](https://www.npmjs.com/package/url-value-parser) - magic behind automatic path normalization
  * [normalizePath.js](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/src/normalizePath.js) - source code for path processing
-
 
 
 ## express example
@@ -178,7 +197,7 @@ while replacing all HEX values starting from 5 characters and all emails in the 
             "urlValueParser": {
               "minHexLength": 5,
               "extraMasks": [
-                "^[^@]+@[^@]+\\.[^@]+$"
+                "^[0-9]+\\.[0-9]+\\.[0-9]+$"
               ]
             }
           }

@@ -5,7 +5,6 @@ const app = express();
 const promBundle = require('express-prom-bundle');
 
 const bundle = promBundle({
-  blacklist: [/up/],
   buckets: [0.1, 0.4, 0.7],
   includeMethod: true,
   includePath: true,
@@ -19,9 +18,12 @@ const bundle = promBundle({
   urlValueParser: {
     minHexLength: 5,
     extraMasks: [
-      "^[^@]+@[^@]+\\.[^@]+$"
+      "^[0-9]+\\.[0-9]+\\.[0-9]+$" // replace dot-separated dates with #val
     ]
-  }
+  },
+  normalizePath: [
+    ['^/foo', '/example'] // replace /foo with /example
+  ]
 });
 
 app.use(bundle);
@@ -46,7 +48,7 @@ app.listen(3000, () => console.info(  // eslint-disable-line
   'listening on 3000\n'
   + 'test in shell console\n\n'
   + 'curl localhost:3000/foo/1234\n'
-  + 'curl localhost:3000/foo/john%40example.com\n'
+  + 'curl localhost:3000/foo/09.08.2018\n'
   + 'curl -X DELETE localhost:3000/foo/5432\n'
   + 'curl localhost:3000/bar\n'
   + 'curl localhost:3000/metrics\n'
