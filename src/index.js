@@ -45,7 +45,7 @@ function clusterMetrics() {
         if (aggregatorRegistry) {
           aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
               if (err) {
-                  console.log(err);
+                  console.error(err);
               }
               res.set('Content-Type', aggregatorRegistry.contentType);
               res.send(clusterMetrics);
