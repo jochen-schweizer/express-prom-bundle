@@ -71,6 +71,11 @@ function main(opts) {
     promClient.collectDefaultMetrics(opts.promClient.collectDefaultMetrics);
   }
 
+  let aggregatorRegistry;
+  if (opts.clusterMaster) {
+    aggregatorRegistry = new promClient.AggregatorRegistry();
+  }
+
   const httpMetricName = opts.httpDurationMetricName || 'http_request_duration_seconds';
 
   const metricTemplates = {
@@ -114,10 +119,28 @@ function main(opts) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     res.end(promClient.register.metrics());
   };
+  
+  const clusterMetrics = function(req, res) {
+      if (aggregatorRegistry) {
+        aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
+            if (err) {
+                console.log(err);
+            }
+            res.set('Content-Type', aggregatorRegistry.contentType);
+            res.send(clusterMetrics);
+        });
+      } else {
+        return next();
+      }
+  };
 
   const middleware = function (req, res, next) {
     const path = req.originalUrl || req.url; // originalUrl gets lost in koa-connect?
     let labels;
+
+    if (opts.clusterMaster) {
+        return clusterMetrics(req, res, next);
+    }
 
     if (opts.autoregister && path.match(/^\/metrics\/?$/)) {
       return metricsMiddleware(req, res);
