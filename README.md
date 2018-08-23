@@ -50,7 +50,7 @@ if (cluster.isMaster) {
         workers.push(worker);
     }
     const metricsApp = express();
-    metricsApp.use('/cluster_metrics', promBundle({clusterMaster: true}));
+    metricsApp.use('/cluster_metrics', promBundle.clusterMetrics());
     metricsApp.listen(9999);
     console.log('metrics listening on 9999'); // call localhost:9999/cluster_metrics for aggregated metrics
 } else {
