@@ -38,6 +38,26 @@ function prepareMetricNames(opts, metricTemplates) {
   return names;
 }
 
+function clusterMetrics() {
+    const aggregatorRegistry = new promClient.AggregatorRegistry();
+
+    const metricsMiddleware = function(req, res, next) {
+        if (aggregatorRegistry) {
+          aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
+              if (err) {
+                  console.error(err);
+              }
+              res.set('Content-Type', aggregatorRegistry.contentType);
+              res.send(clusterMetrics);
+          });
+        } else {
+          return next();
+        }
+    };
+
+    return metricsMiddleware;
+}
+
 function main(opts) {
   opts = Object.assign(
     {
@@ -120,7 +140,7 @@ function main(opts) {
     let labels;
 
     if (opts.autoregister && path.match(/^\/metrics\/?$/)) {
-      return metricsMiddleware(req, res);
+        return metricsMiddleware(req, res);
     }
 
     if (opts.excludeRoutes && matchVsRegExps(path, opts.excludeRoutes)) {
@@ -165,4 +185,5 @@ function main(opts) {
 main.promClient = promClient;
 main.normalizePath = normalizePath;
 main.normalizeStatusCode = normalizeStatusCode;
+main.clusterMetrics = clusterMetrics;
 module.exports = main;

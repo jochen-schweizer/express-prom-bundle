@@ -40,6 +40,28 @@ The order in which the routes are registered is important, since
 You can use this to your advantage to bypass some of the routes.
 See the example below.
 
+## Usage with Node Cluster
+``` javascript
+if (cluster.isMaster) {
+    const numCPUs = Math.max(2, os.cpus().length);
+    const workers: cluster.Worker[] = [];
+    for (let i=1; i < numCPUs; i++) {
+        const worker = forkWorker();
+        workers.push(worker);
+    }
+    const metricsApp = express();
+    metricsApp.use('/cluster_metrics', promBundle.clusterMetrics());
+    metricsApp.listen(9999);
+    console.log('metrics listening on 9999'); // call localhost:9999/cluster_metrics for aggregated metrics
+} else {
+    const app = express();
+    app.use(promBundle({includeMethod: true});
+    app.use('/api', require('./api'));
+    app.listen(3000);
+}
+```
+The code the master process runs will expose an API with a single endpoint `/cluster_metrics` which returns an aggregate of all metrics from all the workers.
+
 ## Options
 
 Which labels to include in `http_request_duration_seconds` metric:
