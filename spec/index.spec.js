@@ -259,6 +259,20 @@ describe('index', () => {
     });
   });
 
+  describe('usage of clusterMetrics()', () => {
+    it('clusterMetrics returns metrics for aggregator', (done) => {
+        const app = express();
+        app.use('/cluster_metrics', bundle.clusterMetrics());
+        const agent = supertest(app);
+        agent
+        .get('/metrics_cluster')
+        .expect(200)
+        .end((err, res) => {
+          done(err);
+        });
+    });
+  });
+
   it('formatStatusCode can be overridden', done => {
     const app = express();
     const instance = bundle({
