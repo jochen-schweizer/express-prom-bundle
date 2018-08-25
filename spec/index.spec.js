@@ -8,6 +8,7 @@ const Koa = require('koa');
 const c2k = require('koa-connect');
 const supertestKoa = require('supertest-koa-agent');
 const promClient = require('prom-client');
+const cluster = require('cluster');
 
 describe('index', () => {
   beforeEach(() => {
@@ -259,20 +260,6 @@ describe('index', () => {
     });
   });
 
-  describe('usage of clusterMetrics()', () => {
-    it('clusterMetrics returns metrics for aggregator', (done) => {
-        const app = express();
-        app.use('/cluster_metrics', bundle.clusterMetrics());
-        const agent = supertest(app);
-        agent
-        .get('/metrics_cluster')
-        .expect(200)
-        .end((err, res) => {
-          done(err);
-        });
-    });
-  });
-
   it('formatStatusCode can be overridden', done => {
     const app = express();
     const instance = bundle({
@@ -396,5 +383,41 @@ describe('index', () => {
       }
     });
     expect(spy).toHaveBeenCalledWith({timeout: 3000});
+  });
+
+  describe('usage of clusterMetrics()', () => {
+    it('clusterMetrics returns 200 even without a cluster', (done) => {
+        const app = express();
+
+        cluster.workers = [];
+
+        app.use('/cluster_metrics', bundle.clusterMetrics());
+        const agent = supertest(app);
+        agent
+          .get('/cluster_metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            done();
+          });
+    });
+
+    it('clusterMetrics returns 500 in case of an error', (done) => {
+      const app = express();
+      app.use('/cluster_metrics', bundle.clusterMetrics());
+      const agent = supertest(app);
+
+      // create a fake worker, which would not respond in time
+      cluster.workers = [{send: () => {}}];
+
+      const errorSpy = spyOn(console, 'error'); // mute console.error
+
+      agent
+        .get('/cluster_metrics')
+        .end((err, res) => {
+          expect(res.status).toBe(500);
+          expect(errorSpy).toHaveBeenCalled();
+          done();
+        });
+    }, 6000);
   });
 });

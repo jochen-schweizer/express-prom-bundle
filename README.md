@@ -192,6 +192,42 @@ app.use(/* your middleware */);
 app.listen(3000);
 ```
 
+## using with cluster
+
+You'll need to use an additional **clusterMetrics()** middleware.
+
+In the example below the master process will expose an API with a single endpoint `/metrics`
+which returns an aggregate of all metrics from all the workers.
+
+``` javascript
+const cluster = require('cluster');
+const promBundle = require('./src/index');
+const numCPUs = Math.max(2, require('os').cpus().length);
+const express = require('express');
+
+if (cluster.isMaster) {
+    for (let i = 1; i < numCPUs; i++) {
+        cluster.fork();
+    }
+
+    const metricsApp = express();
+    metricsApp.use('/metrics', promBundle.clusterMetrics());
+    metricsApp.listen(9999);
+
+    console.log('cluster metrics listening on 9999');
+    console.log('call localhost:9999/metrics for aggregated metrics');
+} else {
+    const app = express();
+    app.use(promBundle({
+        autoregister: false, // disable /metrics for single workers
+        includeMethod: true
+    }));
+    app.use((req, res) => res.send(`hello from pid ${process.pid}\n`));
+    app.listen(3000);
+    console.log(`worker ${process.pid} listening on 3000`);
+}
+```
+
 ## using with kraken.js
 
 Here is meddleware config sample, which can be used in a standard **kraken.js** application.
