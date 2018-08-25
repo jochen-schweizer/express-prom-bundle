@@ -42,17 +42,14 @@ function clusterMetrics() {
     const aggregatorRegistry = new promClient.AggregatorRegistry();
 
     const metricsMiddleware = function(req, res, next) {
-        if (aggregatorRegistry) {
-          aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
-              if (err) {
-                  console.error(err);
-              }
-              res.set('Content-Type', aggregatorRegistry.contentType);
-              res.send(clusterMetrics);
-          });
-        } else {
-          return next();
+      aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
+        if (err) {
+            console.error(err);
+            return res.sendStatus(500);
         }
+        res.set('Content-Type', aggregatorRegistry.contentType);
+        res.send(clusterMetrics);
+      });
     };
 
     return metricsMiddleware;
