@@ -408,7 +408,7 @@ describe('index', () => {
 
       // create a fake worker, which would not respond in time
       cluster.workers = [{send: () => {}}];
-      
+
       const errorSpy = spyOn(console, 'error'); // mute console.error
 
       agent
@@ -416,7 +416,7 @@ describe('index', () => {
         .end((err, res) => {
           expect(res.status).toBe(500);
           expect(errorSpy).toHaveBeenCalled();
-          done(err);
+          done();
         });
     }, 6000);
   });
