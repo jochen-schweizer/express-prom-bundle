@@ -172,7 +172,7 @@ app.listen(3000);
 
 ## using with cluster
 
-You'll need tp use an additional **clusterMetrics()** middleware.
+You'll need to use an additional **clusterMetrics()** middleware.
 
 In the example below the master process will expose an API with a single endpoint `/metrics`
 which returns an aggregate of all metrics from all the workers.
