@@ -11,7 +11,8 @@
     "method"
   ],
   "scripts": {
-    "test": "jasme"
+    "test": "node_modules/jasme/jasme",
+    "coverage": "make coverage"
   },
   "author": "Konstantin Pogorelov <or@pluseq.com>",
   "license": "MIT",
