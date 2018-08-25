@@ -11,7 +11,7 @@
     "method"
   ],
   "scripts": {
-    "test": "node_modules/jasme/jasme",
+    "test": "node_modules/jasme/run.js",
     "coverage": "make coverage"
   },
   "author": "Konstantin Pogorelov <or@pluseq.com>",
