@@ -419,5 +419,45 @@ describe('index', () => {
           done();
         });
     }, 6000);
+
+    it('metrics type summary works', done => {
+      const app = express();
+      const bundled = bundle({
+        metricsType: 'summary'
+      });
+      app.use(bundled);
+      app.use('/test', (req, res) => res.send('it worked'));
+
+      const agent = supertest(app);
+      agent.get('/test').end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/quantile="/);
+            done();
+          });
+      });
+    });
+
+    it('metrics type histogram works', done => {
+      const app = express();
+      const bundled = bundle({
+        metricsType: 'histogram'
+      });
+      app.use(bundled);
+      app.use('/test', (req, res) => res.send('it worked'));
+
+      const agent = supertest(app);
+      agent.get('/test').end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/le="/);
+            done();
+          });
+      });
+    });
   });
 });

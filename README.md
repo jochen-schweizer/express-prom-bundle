@@ -9,7 +9,7 @@ Internally it uses **prom-client**. See: https://github.com/siimon/prom-client
 Included metrics:
 
 * `up`: normally is just 1
-* `http_request_duration_seconds`: http latency histogram labeled with `status_code`, `method` and `path`
+* `http_request_duration_seconds`: http latency histogram/summary labeled with `status_code`, `method` and `path`
 
 ## Install
 
@@ -63,6 +63,12 @@ if (cluster.isMaster) {
 The code the master process runs will expose an API with a single endpoint `/cluster_metrics` which returns an aggregate of all metrics from all the workers.
 
 ## Options
+
+Metrics type:
+
+* **metricsType**: two metrics type are supported for `http_request_duration_seconds` metric: [histogram](https://prometheus.io/docs/concepts/metric_types/#histogram) and [summary](https://prometheus.io/docs/concepts/metric_types/#summary),  default: **histogram**
+
+
 
 Which labels to include in `http_request_duration_seconds` metric:
 
