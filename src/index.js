@@ -108,20 +108,23 @@ function main(opts) {
         labels.push.apply(labels, Object.keys(opts.customLabels));
       }
 
-      const metric = opts.metricsType === 'summary' ?
-        new promClient.Summary({
+      if (opts.metricsType === 'summary') {
+        return new promClient.Summary({
           name: httpMetricName,
           help: 'duration summary of http responses labeled with: ' + labels.join(', '),
           labelNames: labels,
           percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999]
-        }) :
-        new promClient.Histogram({
+        });
+       } else if (opts.metricsType === 'histogram') {
+        return new promClient.Histogram({
           name: httpMetricName,
           help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
           labelNames: labels,
           buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
         });
-      return metric;
+      } else {
+        throw new Error('metricsType option must be histogram or summary');
+      }
     }
   };
 
