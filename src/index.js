@@ -113,7 +113,7 @@ function main(opts) {
           name: httpMetricName,
           help: 'duration summary of http responses labeled with: ' + labels.join(', '),
           labelNames: labels,
-          percentiles: [0.5, 0.75, 0.95, 0.98, 0.99, 0.999]
+          percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999]
         }) :
         new promClient.Histogram({
           name: httpMetricName,

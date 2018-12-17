@@ -93,6 +93,7 @@ Extra transformation callbacks:
 Other options:
 
 * **buckets**: buckets used for `http_request_duration_seconds` histogram
+* **percentiles**: percentiles used for `http_request_duration_seconds` summary
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
 * **promClient**: options for promClient startup, e.g. **collectDefaultMetrics**. This option was added
   to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
