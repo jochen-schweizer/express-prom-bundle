@@ -115,7 +115,7 @@ function main(opts) {
           labelNames: labels,
           percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999]
         });
-       } else if (opts.metricsType === 'histogram') {
+       } else if (opts.metricsType === 'histogram' || !opts.metricsType) {
         return new promClient.Histogram({
           name: httpMetricName,
           help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
