@@ -186,10 +186,10 @@ describe('index', () => {
       });
   });
 
-  it('metrics type summary works', done => {
+  it('metric type summary works', done => {
     const app = express();
     const bundled = bundle({
-      metricsType: 'summary',
+      metricType: 'summary',
       percentiles: [0.5, 0.85, 0.99],
     });
     app.use(bundled);
@@ -207,10 +207,10 @@ describe('index', () => {
     });
   });
 
-  it('metrics type histogram works', done => {
+  it('metric type histogram works', done => {
     const app = express();
     const bundled = bundle({
-      metricsType: 'histogram',
+      metricType: 'histogram',
       buckets: [10, 100],
     });
     app.use(bundled);
@@ -230,7 +230,7 @@ describe('index', () => {
 
   it('throws on unknown metricType ', () => {
     expect(() => {
-      bundle({metricsType: 'hello',});
+      bundle({metricType: 'hello'});
     }).toThrow();
   });
 

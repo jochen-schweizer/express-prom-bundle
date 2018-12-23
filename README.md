@@ -64,12 +64,6 @@ The code the master process runs will expose an API with a single endpoint `/clu
 
 ## Options
 
-Metrics type:
-
-* **metricsType**: two metrics type are supported for `http_request_duration_seconds` metric: [histogram](https://prometheus.io/docs/concepts/metric_types/#histogram) and [summary](https://prometheus.io/docs/concepts/metric_types/#summary),  default: **histogram**
-
-
-
 Which labels to include in `http_request_duration_seconds` metric:
 
 * **includeStatusCode**: HTTP status code (200, 400, 404 etc.), default: **true**
@@ -89,6 +83,10 @@ Extra transformation callbacks:
   See the [docs](https://github.com/disjunction/url-value-parser) of url-value-parser module for details.
 * **formatStatusCode**: `function(res)` producing final status code from express `res` object, e.g. you can combine `200`, `201` and `204` to just `2xx`.
 * **transformLabels**: `function(labels, req, res)` transforms the **labels** object, e.g. setting dynamic values to **customLabels**
+
+Metric type:
+
+* **metricType**: two metric types are supported for `http_request_duration_seconds` metric: [histogram](https://prometheus.io/docs/concepts/metric_types/#histogram) and [summary](https://prometheus.io/docs/concepts/metric_types/#summary),  default: **histogram**
 
 Other options:
 
