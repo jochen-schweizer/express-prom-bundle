@@ -62,6 +62,7 @@ function main(opts) {
       includeStatusCode: true,
       normalizePath: main.normalizePath,
       formatStatusCode: main.normalizeStatusCode,
+      metricsType: 'histogram',
       promClient: {}
     },
     opts
@@ -106,13 +107,24 @@ function main(opts) {
       if (opts.customLabels){
         labels.push.apply(labels, Object.keys(opts.customLabels));
       }
-      const metric = new promClient.Histogram({
-        name: httpMetricName,
-        help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
-        labelNames: labels,
-        buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
-      });
-      return metric;
+
+      if (opts.metricsType === 'summary') {
+        return new promClient.Summary({
+          name: httpMetricName,
+          help: 'duration summary of http responses labeled with: ' + labels.join(', '),
+          labelNames: labels,
+          percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999]
+        });
+       } else if (opts.metricsType === 'histogram' || !opts.metricsType) {
+        return new promClient.Histogram({
+          name: httpMetricName,
+          help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
+          labelNames: labels,
+          buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
+        });
+      } else {
+        throw new Error('metricsType option must be histogram or summary');
+      }
     }
   };
 

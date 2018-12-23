@@ -9,7 +9,7 @@ Internally it uses **prom-client**. See: https://github.com/siimon/prom-client
 Included metrics:
 
 * `up`: normally is just 1
-* `http_request_duration_seconds`: http latency histogram labeled with `status_code`, `method` and `path`
+* `http_request_duration_seconds`: http latency histogram/summary labeled with `status_code`, `method` and `path`
 
 ## Install
 
@@ -64,6 +64,12 @@ The code the master process runs will expose an API with a single endpoint `/clu
 
 ## Options
 
+Metrics type:
+
+* **metricsType**: two metrics type are supported for `http_request_duration_seconds` metric: [histogram](https://prometheus.io/docs/concepts/metric_types/#histogram) and [summary](https://prometheus.io/docs/concepts/metric_types/#summary),  default: **histogram**
+
+
+
 Which labels to include in `http_request_duration_seconds` metric:
 
 * **includeStatusCode**: HTTP status code (200, 400, 404 etc.), default: **true**
@@ -87,6 +93,7 @@ Extra transformation callbacks:
 Other options:
 
 * **buckets**: buckets used for `http_request_duration_seconds` histogram
+* **percentiles**: percentiles used for `http_request_duration_seconds` summary
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
 * **promClient**: options for promClient startup, e.g. **collectDefaultMetrics**. This option was added
   to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,

@@ -186,6 +186,54 @@ describe('index', () => {
       });
   });
 
+  it('metrics type summary works', done => {
+    const app = express();
+    const bundled = bundle({
+      metricsType: 'summary',
+      percentiles: [0.5, 0.85, 0.99],
+    });
+    app.use(bundled);
+    app.use('/test', (req, res) => res.send('it worked'));
+
+    const agent = supertest(app);
+    agent.get('/test').end(() => {
+      agent
+        .get('/metrics')
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.text).toMatch(/quantile="0.85"/);
+          done();
+        });
+    });
+  });
+
+  it('metrics type histogram works', done => {
+    const app = express();
+    const bundled = bundle({
+      metricsType: 'histogram',
+      buckets: [10, 100],
+    });
+    app.use(bundled);
+    app.use('/test', (req, res) => res.send('it worked'));
+
+    const agent = supertest(app);
+    agent.get('/test').end(() => {
+      agent
+        .get('/metrics')
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.text).toMatch(/le="100"/);
+          done();
+        });
+    });
+  });
+
+  it('throws on unknown metricType ', () => {
+    expect(() => {
+      bundle({metricsType: 'hello',});
+    }).toThrow();
+  });
+
   describe('usage of normalizePath()', () => {
 
     it('normalizePath can be replaced gloablly', done => {
