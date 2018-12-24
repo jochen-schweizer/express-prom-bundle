@@ -4,3 +4,5 @@ spec
 .travis.yml
 .eslintrc
 coverage
+.vscode
+Makefile
