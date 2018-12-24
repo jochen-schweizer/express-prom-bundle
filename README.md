@@ -217,7 +217,7 @@ if (cluster.isMaster) {
 
 Here is meddleware config sample, which can be used in a standard **kraken.js** application.
 In this case the stats for URI paths and HTTP methods are collected separately,
-while replacing all HEX values starting from 5 characters and all emails in the path as #val.
+while replacing all HEX values starting from 5 characters and all IP addresses in the path as #val.
 
 ```json
 {
@@ -240,7 +240,7 @@ while replacing all HEX values starting from 5 characters and all emails in the 
             "urlValueParser": {
               "minHexLength": 5,
               "extraMasks": [
-                "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$"
               ]
             }
           }
