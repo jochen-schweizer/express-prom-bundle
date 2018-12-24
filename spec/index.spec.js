@@ -18,8 +18,66 @@ describe('index', () => {
   it('metrics returns up=1', done => {
     const app = express();
     const bundled = bundle({
-      whitelist: ['up']
+      excludeRoutes: ['/irrelevant', /at.all/]
     });
+    app.use(bundled);
+    app.use('/test', (req, res) => res.send('it worked'));
+
+    const agent = supertest(app);
+    agent.get('/test').end(() => {
+      agent
+        .get('/metrics')
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.text).toMatch(/up\s1/);
+          done();
+        });
+    });
+  });
+
+  it('"up"-metric can be excluded', done => {
+    const app = express();
+    const bundled = bundle({
+      includeUp: false
+    });
+    app.use(bundled);
+    app.use('/test', (req, res) => res.send('it worked'));
+
+    const agent = supertest(app);
+    agent.get('/test').end(() => {
+      agent
+        .get('/metrics')
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.text).not.toMatch(/up\s1/);
+          done();
+        });
+    });
+  });
+
+  it('metrics path can be defined with a regex', done => {
+    const app = express();
+    const bundled = bundle({
+      metricsPath: /^\/prometheus$/
+    });
+    app.use(bundled);
+    app.use('/test', (req, res) => res.send('it worked'));
+
+    const agent = supertest(app);
+    agent.get('/test').end(() => {
+      agent
+        .get('/prometheus')
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.text).toMatch(/up\s1/);
+          done();
+        });
+    });
+  });
+
+  it('metrics path can be defined as regexp', done => {
+    const app = express();
+    const bundled = bundle();
     app.use(bundled);
     app.use('/test', (req, res) => res.send('it worked'));
 
@@ -52,9 +110,7 @@ describe('index', () => {
 
   it('metrics should be attached to /metrics by default', done => {
     const app = express();
-    const bundled = bundle({
-      whitelist: ['up']
-    });
+    const bundled = bundle();
     app.use(bundled);
 
     const agent = supertest(app);
@@ -83,27 +139,6 @@ describe('index', () => {
       });
   });
 
-  it('metrics can be filtered using exect match', () => {
-    const instance = bundle({blacklist: ['up']});
-    expect(instance.metrics.up).not.toBeDefined();
-    expect(instance.metrics.http_request_duration_seconds).toBeDefined();
-  });
-  it('metrics can be filtered using regex', () => {
-    const instance = bundle({blacklist: [/http/]});
-    expect(instance.metrics.up).toBeDefined();
-    expect(instance.metrics.http_request_duration_seconds).not.toBeDefined();
-  });
-  it('metrics can be whitelisted', () => {
-    const instance = bundle({whitelist: [/^up$/]});
-    expect(instance.metrics.up).toBeDefined();
-    expect(instance.metrics.nodejs_memory_heap_total_bytes).not.toBeDefined();
-    expect(instance.metrics.http_request_duration_seconds).not.toBeDefined();
-  });
-  it('throws on both white and blacklist', () => {
-    expect(() => {
-      bundle({whitelist: [/up/], blacklist: [/up/]});
-    }).toThrow();
-  });
   it('returns error 500 on incorrect middleware usage', done => {
     const app = express();
     app.use(bundle);
@@ -140,22 +175,27 @@ describe('index', () => {
   it('filters out the excludeRoutes', done => {
     const app = express();
     const instance = bundle({
-      excludeRoutes: ['/test']
+      excludeRoutes: ['/test', /bad.word/]
     });
     app.use(instance);
     app.use('/test', (req, res) => res.send('it worked'));
+    app.use('/some/bad-word', (req, res) => res.send('it worked too'));
     const agent = supertest(app);
     agent
       .get('/test')
       .end(() => {
-        const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
-        expect(metricHashMap['status_code:200']).not.toBeDefined();
-
         agent
-          .get('/metrics')
-          .end((err, res) => {
-            expect(res.status).toBe(200);
-            done();
+          .get('/some/bad-word')
+          .end(() => {
+            const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
+            expect(metricHashMap['status_code:200']).not.toBeDefined();
+
+            agent
+              .get('/metrics')
+              .end((err, res) => {
+                expect(res.status).toBe(200);
+                done();
+              });
           });
       });
   });
@@ -184,27 +224,6 @@ describe('index', () => {
             done();
           });
       });
-  });
-
-  it('metric type summary works', done => {
-    const app = express();
-    const bundled = bundle({
-      metricType: 'summary',
-      percentiles: [0.5, 0.85, 0.99],
-    });
-    app.use(bundled);
-    app.use('/test', (req, res) => res.send('it worked'));
-
-    const agent = supertest(app);
-    agent.get('/test').end(() => {
-      agent
-        .get('/metrics')
-        .end((err, res) => {
-          expect(res.status).toBe(200);
-          expect(res.text).toMatch(/quantile="0.85"/);
-          done();
-        });
-    });
   });
 
   it('metric type histogram works', done => {
@@ -400,9 +419,7 @@ describe('index', () => {
 
   it('Koa: metrics returns up=1', done => {
     const app = new Koa();
-    const bundled = bundle({
-      whitelist: ['up']
-    });
+    const bundled = bundle();
     app.use(c2k(bundled));
 
     app.use(function(ctx, next) {
@@ -467,5 +484,48 @@ describe('index', () => {
           done();
         });
     }, 6000);
+  });
+
+  describe('metricType: summary', () => {
+    it('metric type summary works', done => {
+      const app = express();
+      const bundled = bundle({
+        metricType: 'summary'
+      });
+      app.use(bundled);
+      app.use('/test', (req, res) => res.send('it worked'));
+
+      const agent = supertest(app);
+      agent.get('/test').end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/quantile="0.98"/);
+            done();
+          });
+      });
+    });
+
+    it('custom pecentiles work', done => {
+      const app = express();
+      const bundled = bundle({
+        metricType: 'summary',
+        percentiles: [0.5, 0.85, 0.99],
+      });
+      app.use(bundled);
+      app.use('/test', (req, res) => res.send('it worked'));
+
+      const agent = supertest(app);
+      agent.get('/test').end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).toMatch(/quantile="0.85"/);
+            done();
+          });
+      });
+    });
   });
 });

@@ -4,7 +4,7 @@
 
 Express middleware with popular prometheus metrics in one bundle. It's also compatible with koa v1 and v2 (see below).
 
-Internally it uses **prom-client**. See: https://github.com/siimon/prom-client
+Since version 5 it uses **prom-client** as a peer dependency. See: https://github.com/siimon/prom-client
 
 Included metrics:
 
@@ -14,7 +14,7 @@ Included metrics:
 ## Install
 
 ```
-npm install express-prom-bundle
+npm install prom-client express-prom-bundle
 ```
 
 ## Sample Usage
@@ -49,6 +49,8 @@ Which labels to include in `http_request_duration_seconds` metric:
 * **includePath**: URL path (see importent details below), default: **false**
 * **customLabels**: an object containing extra labels, e.g. ```{project_name: 'hello_world'}```.
   Most useful together with **transformLabels** callback, otherwise it's better to use native Prometheus relabeling.
+* **includeUp**: include an auxiliary "up"-metric which always returns 1, default: **true**
+* **metricsPath**: replace the `/metrics` route with a **regex** or exact **string**. Note: it is highly recommended to just stick to the default
 
 Extra transformation callbacks:
 

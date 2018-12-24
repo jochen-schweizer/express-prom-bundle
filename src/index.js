@@ -1,11 +1,10 @@
-'use strict';
 const onFinished = require('on-finished');
 const promClient = require('prom-client');
 const normalizePath = require('./normalizePath');
 const normalizeStatusCode = require('./normalizeStatusCode');
 
 function matchVsRegExps(element, regexps) {
-  for (let regexp of regexps) {
+  for (const regexp of regexps) {
     if (regexp instanceof RegExp) {
       if (element.match(regexp)) {
         return true;
@@ -17,31 +16,10 @@ function matchVsRegExps(element, regexps) {
   return false;
 }
 
-function filterArrayByRegExps(array, regexps) {
-  return array.filter(element => {
-    return matchVsRegExps(element, regexps);
-  });
-}
-
-function prepareMetricNames(opts, metricTemplates) {
-  const names = Object.keys(metricTemplates);
-  if (opts.whitelist) {
-    if (opts.blacklist) {
-      throw new Error('you cannot have whitelist and blacklist at the same time');
-    }
-    return filterArrayByRegExps(names, opts.whitelist);
-  }
-  if (opts.blacklist) {
-    const blacklisted = filterArrayByRegExps(names, opts.blacklist);
-    return names.filter(name => blacklisted.indexOf(name) === -1);
-  }
-  return names;
-}
-
 function clusterMetrics() {
     const aggregatorRegistry = new promClient.AggregatorRegistry();
 
-    const metricsMiddleware = function(req, res, next) {
+    const metricsMiddleware = function(req, res) {
       aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
         if (err) {
             console.error(err);
@@ -56,17 +34,6 @@ function clusterMetrics() {
 }
 
 function main(opts) {
-  opts = Object.assign(
-    {
-      autoregister: true,
-      includeStatusCode: true,
-      normalizePath: main.normalizePath,
-      formatStatusCode: main.normalizeStatusCode,
-      metricType: 'histogram',
-      promClient: {}
-    },
-    opts
-  );
   if (arguments[2] && arguments[1] && arguments[1].send) {
     arguments[1].status(500)
       .send('<h1>500 Error</h1>\n'
@@ -76,12 +43,27 @@ function main(opts) {
     return;
   }
 
-  if (opts.prefix || opts.keepDefaultMetrics !== undefined) {
+  opts = Object.assign(
+    {
+      autoregister: true,
+      includeStatusCode: true,
+      normalizePath: main.normalizePath,
+      formatStatusCode: main.normalizeStatusCode,
+      metricType: 'histogram',
+      promClient: {}
+    }, opts
+  );
+
+  if (opts.prefix
+    || opts.keepDefaultMetrics !== undefined
+    || opts.whitelist !== undefined
+    || opts.blacklist !== undefined
+  ) {
     throw new Error(
-      'express-prom-bundle detected obsolete options:'
-      + 'prefix and/or keepDefaultMetrics. '
+      'express-prom-bundle detected one of the obsolete options: '
+      + 'prefix, keepDefaultMetrics, whitelist, blacklist. '
       + 'Please refer to oficial docs. '
-      + 'Most likely you upgraded the module without necessary code changes'
+      + 'Most likely you upgraded the module without the necessary code changes'
     );
   }
 
@@ -91,51 +73,46 @@ function main(opts) {
 
   const httpMetricName = opts.httpDurationMetricName || 'http_request_duration_seconds';
 
-  const metricTemplates = {
-    'up': () => new promClient.Gauge({
-      name: 'up',
-      help: '1 = up, 0 = not up'
-    }),
-    [httpMetricName]: () => {
-      const labels = ['status_code'];
-      if (opts.includeMethod) {
-        labels.push('method');
-      }
-      if (opts.includePath) {
-        labels.push('path');
-      }
-      if (opts.customLabels){
-        labels.push.apply(labels, Object.keys(opts.customLabels));
-      }
-
-      if (opts.metricType === 'summary') {
-        return new promClient.Summary({
-          name: httpMetricName,
-          help: 'duration summary of http responses labeled with: ' + labels.join(', '),
-          labelNames: labels,
-          percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999]
-        });
-       } else if (opts.metricType === 'histogram' || !opts.metricType) {
-        return new promClient.Histogram({
-          name: httpMetricName,
-          help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
-          labelNames: labels,
-          buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
-        });
-      } else {
-        throw new Error('metricType option must be histogram or summary');
-      }
+  function makeHttpMetric() {
+    const labels = ['status_code'];
+    if (opts.includeMethod) {
+      labels.push('method');
     }
-  };
+    if (opts.includePath) {
+      labels.push('path');
+    }
+    if (opts.customLabels) {
+      labels.push.apply(labels, Object.keys(opts.customLabels));
+    }
 
-  const metrics = {};
-  const names = prepareMetricNames(opts, metricTemplates);
-
-  for (let name of names) {
-    metrics[name] = metricTemplates[name]();
+    if (opts.metricType === 'summary') {
+      return new promClient.Summary({
+        name: httpMetricName,
+        help: 'duration summary of http responses labeled with: ' + labels.join(', '),
+        labelNames: labels,
+        percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999]
+      });
+    } else if (opts.metricType === 'histogram' || !opts.metricType) {
+      return new promClient.Histogram({
+        name: httpMetricName,
+        help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
+        labelNames: labels,
+        buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
+      });
+    } else {
+      throw new Error('metricType option must be histogram or summary');
+    }
   }
 
-  if (metrics.up) {
+  const metrics = {
+    [httpMetricName]: makeHttpMetric()
+  };
+
+  if (opts.includeUp !== false) {
+    metrics.up = new promClient.Gauge({
+      name: 'up',
+      help: '1 = up, 0 = not up'
+    });
     metrics.up.set(1);
   }
 
@@ -144,11 +121,13 @@ function main(opts) {
     res.end(promClient.register.metrics());
   };
 
+  const metricsMatch = opts.metricsPath instanceof RegExp ? opts.metricsPath
+    : new RegExp('^' + (opts.metricsPath || '/metrics') + '/?$');
+
   const middleware = function (req, res, next) {
     const path = req.originalUrl || req.url; // originalUrl gets lost in koa-connect?
-    let labels;
 
-    if (opts.autoregister && path.match(/^\/metrics\/?$/)) {
+    if (opts.autoregister && path.match(metricsMatch)) {
         return metricsMiddleware(req, res);
     }
 
@@ -156,42 +135,42 @@ function main(opts) {
       return next();
     }
 
-    if (metrics[httpMetricName]) {
-      labels = {};
-      let timer = metrics[httpMetricName].startTimer(labels);
-      onFinished(res, () => {
-        if (opts.includeStatusCode) {
-          labels.status_code = opts.formatStatusCode(res, opts);
-        }
-        if (opts.includeMethod) {
-          labels.method = req.method;
-        }
-        if (opts.includePath) {
-          labels.path = typeof opts.normalizePath == 'function'
-            ? opts.normalizePath(req, opts)
-            : main.normalizePath(req, opts);
-        }
-        if (opts.customLabels) {
-          Object.assign(labels, opts.customLabels);
-        }
-        if (opts.transformLabels) {
-          opts.transformLabels(labels, req, res);
-        }
-        timer();
-      });
-    }
+    const labels = {};
+    const timer = metrics[httpMetricName].startTimer(labels);
+
+    onFinished(res, () => {
+      if (opts.includeStatusCode) {
+        labels.status_code = opts.formatStatusCode(res, opts);
+      }
+      if (opts.includeMethod) {
+        labels.method = req.method;
+      }
+      if (opts.includePath) {
+        labels.path = opts.normalizePath instanceof Function
+          ? opts.normalizePath(req, opts)
+          : main.normalizePath(req, opts);
+      }
+      if (opts.customLabels) {
+        Object.assign(labels, opts.customLabels);
+      }
+      if (opts.transformLabels) {
+        opts.transformLabels(labels, req, res);
+      }
+      timer();
+    });
 
     next();
   };
 
-  middleware.metricTemplates = metricTemplates;
   middleware.metrics = metrics;
   middleware.promClient = promClient;
   middleware.metricsMiddleware = metricsMiddleware;
   return middleware;
 }
 
+// this is kept only for compatibility with the code relying on older version
 main.promClient = promClient;
+
 main.normalizePath = normalizePath;
 main.normalizeStatusCode = normalizeStatusCode;
 main.clusterMetrics = clusterMetrics;

@@ -2,6 +2,7 @@
 
 const express = require('express');
 const app = express();
+const promClient = require('prom-client');
 const promBundle = require('express-prom-bundle');
 
 const bundle = promBundle({
@@ -10,6 +11,7 @@ const bundle = promBundle({
   includePath: true,
   customLabels: {year: null},
   transformLabels: labels => Object.assign(labels, {year: new Date().getFullYear()}),
+  metricsPath: '/prometheus',
   promClient: {
     collectDefaultMetrics: {
       timeout: 1000
@@ -29,7 +31,7 @@ const bundle = promBundle({
 app.use(bundle);
 
 // native prom-client metric (no prefix)
-const c1 = new bundle.promClient.Counter({name: 'c1', help: 'c1 help'});
+const c1 = new promClient.Counter({name: 'c1', help: 'c1 help'});
 c1.inc(10);
 
 app.get('/foo/:id', (req, res) => {
@@ -45,11 +47,13 @@ app.delete('/foo/:id', (req, res) => {
 app.get('/bar', (req, res) => res.send('bar response\n'));
 
 app.listen(3000, () => console.info(  // eslint-disable-line
-  'listening on 3000\n'
-  + 'test in shell console\n\n'
-  + 'curl localhost:3000/foo/1234\n'
-  + 'curl localhost:3000/foo/09.08.2018\n'
-  + 'curl -X DELETE localhost:3000/foo/5432\n'
-  + 'curl localhost:3000/bar\n'
-  + 'curl localhost:3000/metrics\n'
+  `listening on 3000
+test in shell console:
+
+curl localhost:3000/foo/1234
+curl localhost:3000/foo/09.08.2018
+curl -X DELETE localhost:3000/foo/5432
+curl localhost:3000/bar
+curl localhost:3000/prometheus
+`
 ));
