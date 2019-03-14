@@ -72,6 +72,8 @@ Other options:
 
 * **buckets**: buckets used for `http_request_duration_seconds` histogram
 * **percentiles**: percentiles used for `http_request_duration_seconds` summary
+* **ageBuckets**: ageBuckets configures how many buckets we will have in our sliding window for the summary
+* **maxAgeSeconds**: the maxAgeSeconds will tell how old an bucket can be before it is reset
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
 * **promClient**: options for promClient startup, e.g. **collectDefaultMetrics**. This option was added
   to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
