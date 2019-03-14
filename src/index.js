@@ -91,7 +91,7 @@ function main(opts) {
         help: 'duration summary of http responses labeled with: ' + labels.join(', '),
         labelNames: labels,
         percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999],
-        maxAgeSeconds:  opts.percentiles,
+        maxAgeSeconds:  opts.maxAgeSeconds,
         ageBuckets: opts.ageBuckets
       });
     } else if (opts.metricType === 'histogram' || !opts.metricType) {
