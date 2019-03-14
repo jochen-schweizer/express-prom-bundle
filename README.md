@@ -51,8 +51,23 @@ Which labels to include in `http_request_duration_seconds` metric:
   Most useful together with **transformLabels** callback, otherwise it's better to use native Prometheus relabeling.
 * **includeUp**: include an auxiliary "up"-metric which always returns 1, default: **true**
 * **metricsPath**: replace the `/metrics` route with a **regex** or exact **string**. Note: it is highly recommended to just stick to the default
+* **metricType**: histogram/summary selection. See more details below
 
-Extra transformation callbacks:
+### metricType option ###
+
+Two metric types are supported for `http_request_duration_seconds` metric:
+* [histogram](https://prometheus.io/docs/concepts/metric_types/#histogram) (default)
+* [summary](https://prometheus.io/docs/concepts/metric_types/#summary)
+
+Additional options for **histogram**:
+* **buckets**: buckets used for the `http_request_duration_seconds` histogram
+
+Additional options for **summary**:
+* **percentiles**: percentiles used for `http_request_duration_seconds` summary
+* **ageBuckets**: ageBuckets configures how many buckets we have in our sliding window for the summary
+* **maxAgeSeconds**: the maxAgeSeconds will tell how old a bucket can be before it is reset
+
+### Transformation callbacks ###
 
 * **normalizePath**: `function(req)`  or `Array`
   * if function is provided, then it should generate path value from express `req`
@@ -64,16 +79,8 @@ Extra transformation callbacks:
 * **formatStatusCode**: `function(res)` producing final status code from express `res` object, e.g. you can combine `200`, `201` and `204` to just `2xx`.
 * **transformLabels**: `function(labels, req, res)` transforms the **labels** object, e.g. setting dynamic values to **customLabels**
 
-Metric type:
+### Other options ###
 
-* **metricType**: two metric types are supported for `http_request_duration_seconds` metric: [histogram](https://prometheus.io/docs/concepts/metric_types/#histogram) and [summary](https://prometheus.io/docs/concepts/metric_types/#summary),  default: **histogram**
-
-Other options:
-
-* **buckets**: buckets used for `http_request_duration_seconds` histogram
-* **percentiles**: percentiles used for `http_request_duration_seconds` summary
-* **ageBuckets**: ageBuckets configures how many buckets we have in our sliding window for the summary
-* **maxAgeSeconds**: the maxAgeSeconds will tell how old a bucket can be before it is reset
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
 * **promClient**: options for promClient startup, e.g. **collectDefaultMetrics**. This option was added
   to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
