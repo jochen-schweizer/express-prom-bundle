@@ -472,7 +472,10 @@ describe('index', () => {
       const agent = supertest(app);
 
       // create a fake worker, which would not respond in time
-      cluster.workers = [{send: () => {}}];
+      cluster.workers = [{
+        isConnected: () => true,
+        send: () => {}
+      }];
 
       const errorSpy = spyOn(console, 'error'); // mute console.error
 
