@@ -10,6 +10,10 @@
     "path",
     "method"
   ],
+  "files": [
+    "src",
+    "index.d.ts"
+  ],
   "scripts": {
     "test": "node_modules/jasme/run.js",
     "coverage": "make coverage"
