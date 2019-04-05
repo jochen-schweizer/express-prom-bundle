@@ -1,8 +1,0 @@
-advanced-example.js
-docker-compose.yml
-spec
-.travis.yml
-.eslintrc
-coverage
-.vscode
-Makefile
