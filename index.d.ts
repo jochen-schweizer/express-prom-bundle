@@ -40,6 +40,6 @@ interface Opts {
 export function normalizePath(
   req: express.Request,
   opts?: { normalizePath?: NormalizePathRegexs }
-);
+): string;
 
 export default function(opts: Opts): express.RequestHandler;
