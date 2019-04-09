@@ -11,7 +11,7 @@ interface Opts {
   autoregister?: boolean;
   buckets?: [number];
 
-  customLabels: { [key: string]: any };
+  customLabels?: { [key: string]: any };
 
   includeStatusCode?: boolean;
   includeMethod?: boolean;
