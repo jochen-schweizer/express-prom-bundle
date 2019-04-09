@@ -10,7 +10,9 @@ interface Labels {
 interface Opts {
   autoregister?: boolean;
   buckets?: [number];
-
+  
+  customLabels: { [key: string]: any };
+  
   includeStatusCode?: boolean;
   includeMethod?: boolean;
   includePath?: boolean;
@@ -21,7 +23,7 @@ interface Opts {
   promClient?: DefaultMetricsCollectorConfiguration;
   normalizePath?: NormalizePathRegexs;
   formatStatusCode?: (res: express.Response) => number | string;
-
+  
   transformLabels: (
     labels: Labels,
     req: express.Request,
