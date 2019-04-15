@@ -24,7 +24,7 @@ interface Opts {
   normalizePath?: NormalizePathRegexs;
   formatStatusCode?: (res: express.Response) => number | string;
 
-  transformLabels: (
+  transformLabels?: (
     labels: Labels,
     req: express.Request,
     res: express.Response
