@@ -9,7 +9,7 @@ interface Labels {
 
 interface Opts {
   autoregister?: boolean;
-  buckets?: [number];
+  buckets?: number[];
 
   customLabels?: { [key: string]: any };
 
