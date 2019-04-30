@@ -3,6 +3,8 @@
 import { Request, RequestHandler, Response } from 'express';
 import { DefaultMetricsCollectorConfiguration } from 'prom-client';
 
+export {};
+
 export = express_prom_bundle;
 
 declare namespace express_prom_bundle {
