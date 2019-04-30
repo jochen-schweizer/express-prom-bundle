@@ -13,7 +13,6 @@ declare namespace express_prom_bundle {
   }
 
   type NormalizePathEntry = [string | RegExp, string];
-  type NormalizePathRegexs = NormalizePathEntry[];
   type NormalizePathFn = (req: Request, opts: Opts) => string;
   type NormalizeStatusCodeFn = (res: Response) => number | string;
   type TransformLabelsFn = (labels: Labels, req: Request, res: Response) => Labels;
@@ -32,7 +31,7 @@ declare namespace express_prom_bundle {
     metricType?: 'summary' | 'histogram';
     metricsPath?: string;
     promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration };
-    normalizePath?: NormalizePathRegexs | NormalizePathFn;
+    normalizePath?: NormalizePathEntry[] | NormalizePathFn;
     formatStatusCode?: NormalizeStatusCodeFn;
     transformLabels?: TransformLabelsFn;
 
