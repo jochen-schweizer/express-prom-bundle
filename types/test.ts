@@ -60,7 +60,6 @@ promBundle({
 });
 
 // TypeScript workaround to write a readonly field
-
 type Writable<T> = { -readonly [K in keyof T]: T[K] };
 const wPromBundle: Writable<promBundle> = promBundle;
 
