@@ -11,7 +11,8 @@
     "method"
   ],
   "files": [
-    "src"
+    "src",
+    "types/index.d.ts"
   ],
   "types": "types",
   "scripts": {
