@@ -4,6 +4,7 @@ test:
 	./node_modules/jasme/run.js
 lint:
 	node_modules/eslint/bin/eslint.js src
+	node_modules/.bin/dtslint types
 coverage:
 	node_modules/istanbul/lib/cli.js cover \
 		-i 'src/*' \
