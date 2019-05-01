@@ -12,11 +12,13 @@
   ],
   "files": [
     "src",
-    "index.d.ts"
+    "types/index.d.ts"
   ],
+  "types": "types",
   "scripts": {
     "test": "node_modules/jasme/run.js",
-    "coverage": "make coverage"
+    "coverage": "make coverage",
+    "dtslint": "dtslint types"
   },
   "author": "Konstantin Pogorelov <or@pluseq.com>",
   "license": "MIT",
@@ -25,15 +27,19 @@
     "url-value-parser": "^2.0.0"
   },
   "devDependencies": {
+    "@types/express": "^4.16.1",
     "coveralls": "^3.0.2",
+    "dtslint": "^0.7.1",
     "eslint": "^5.11.0",
     "express": "^4.16.4",
     "istanbul": "^0.4.5",
     "jasme": "^6.0.0",
     "koa": "^2.6.2",
     "koa-connect": "^2.0.1",
+    "prom-client": "^11.3.0",
     "supertest": "^3.3.0",
-    "supertest-koa-agent": "^0.3.0"
+    "supertest-koa-agent": "^0.3.0",
+    "typescript": "^3.4.5"
   },
   "peerDependencies": {
     "prom-client": "^11.1.2"
