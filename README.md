@@ -52,6 +52,8 @@ Which labels to include in `http_request_duration_seconds` metric:
 * **includeUp**: include an auxiliary "up"-metric which always returns 1, default: **true**
 * **metricsPath**: replace the `/metrics` route with a **regex** or exact **string**. Note: it is highly recommended to just stick to the default
 * **metricType**: histogram/summary selection. See more details below
+* **excludeRoutes**: Set of String or Regexps which routes should be excluded. No default.
+* **excludeFn**: A function what is evaluated after the request has been served for metrics exclusion. No default.
 
 ### metricType option ###
 
