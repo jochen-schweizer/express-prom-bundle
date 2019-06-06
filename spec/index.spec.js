@@ -203,16 +203,17 @@ describe('index', () => {
   it('filters out by the excludeFn', done => {
     const app = express();
     const instance = bundle({
-      excludeRoutes: ['/test'],
-      excludeFn: (req, res) => res.get('X-Ignored') === 'true'
+      includePath: true,
+      excludeFn: (req, res) => !res.locals.included
     });
 
     app.use(instance);
-    app.use('/test', (req, res) => res.send('it worked'));
-    app.use('/ignored', (req, res) => {
-      res.set('X-Ignored', true);
-      res.send('it worked too');
+    app.use('/test', (req, res) => {
+      res.locals.included = true;
+      res.send('it worked');
     });
+
+    app.use('/ignored', (req, res) => res.send('it worked too'));
 
     const agent = supertest(app);
     agent
@@ -222,7 +223,9 @@ describe('index', () => {
           .get('/ignored')
           .end(() => {
             const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
-            expect(metricHashMap['status_code:200']).not.toBeDefined();
+
+            expect(metricHashMap['path:/test,status_code:200']).toBeDefined();
+            expect(metricHashMap['path:/ignored,status_code:200']).not.toBeDefined();
 
             agent
               .get('/metrics')
