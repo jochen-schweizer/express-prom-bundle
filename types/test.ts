@@ -32,7 +32,11 @@ promClient.register.clear();
 
 // $ExpectType RequestHandler
 promBundle({
-  buckets: [0.1, 0.4, 0.7],
+  metricType: 'summary',
+  metricsPath: '/prometheus',
+  percentiles: [0.1, 0.4, 0.7],
+  maxAgeSeconds: 5,
+  ageBuckets: 10,
 
   excludeRoutes: ['foo', /foo/],
   excludeFn: (_req, _res) => false,
@@ -44,8 +48,6 @@ promBundle({
     ...labels,
     year: new Date().getFullYear()
   }),
-  metricType: 'summary',
-  metricsPath: '/prometheus',
   promClient: {
     collectDefaultMetrics: {
       timeout: 1000
@@ -61,6 +63,13 @@ promBundle({
     ['^/foo', '/example'] // replace /foo with /example
   ],
   formatStatusCode: (res: Response) => res.statusCode + 100
+});
+
+// $ExpectType RequestHandler
+promBundle({
+  buckets: [0.1, 0.4, 0.7],
+  metricType: 'histogram',
+  httpDurationMetricName: 'http_request_duration_seconds'
 });
 
 // TypeScript workaround to write a readonly field

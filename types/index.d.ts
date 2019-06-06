@@ -21,24 +21,36 @@ declare namespace express_prom_bundle {
 
   interface Opts {
     autoregister?: boolean;
-    buckets?: number[];
 
     excludeRoutes?: StringOrRegExp[];
     excludeFn?: ExcludeFn;
 
     customLabels?: { [key: string]: any };
+    transformLabels?: TransformLabelsFn;
 
     includeStatusCode?: boolean;
-    includeMethod?: boolean;
+    formatStatusCode?: NormalizeStatusCodeFn;
+
     includePath?: boolean;
+    normalizePath?: NormalizePathEntry[] | NormalizePathFn;
+
+    includeMethod?: boolean;
     includeUp?: boolean;
+
+    httpDurationMetricName?: string;
 
     metricType?: 'summary' | 'histogram';
     metricsPath?: string;
+
+    // summary
+    percentiles?: number[];
+    maxAgeSeconds?: number;
+    ageBuckets?: number;
+
+    // histogram
+    buckets?: number[];
+
     promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration };
-    normalizePath?: NormalizePathEntry[] | NormalizePathFn;
-    formatStatusCode?: NormalizeStatusCodeFn;
-    transformLabels?: TransformLabelsFn;
 
     // https://github.com/disjunction/url-value-parser#options
     urlValueParser?: {
