@@ -200,6 +200,40 @@ describe('index', () => {
       });
   });
 
+  it('filters out by the excludeFn', done => {
+    const app = express();
+    const instance = bundle({
+      excludeRoutes: ['/test'],
+      excludeFn: (req, res) => res.get('X-Ignored') === 'true'
+    });
+
+    app.use(instance);
+    app.use('/test', (req, res) => res.send('it worked'));
+    app.use('/ignored', (req, res) => {
+      res.set('X-Ignored', true);
+      res.send('it worked too');
+    });
+
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/ignored')
+          .end(() => {
+            const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
+            expect(metricHashMap['status_code:200']).not.toBeDefined();
+
+            agent
+              .get('/metrics')
+              .end((err, res) => {
+                expect(res.status).toBe(200);
+                done();
+              });
+          });
+      });
+  });
+
   it('complains about deprecated options', () => {
     expect(() => bundle({prefix: 'hello'})).toThrow();
   });
