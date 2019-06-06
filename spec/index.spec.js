@@ -213,19 +213,18 @@ describe('index', () => {
       res.send('it worked');
     });
 
-    app.use('/ignored', (req, res) => res.send('it worked too'));
 
     const agent = supertest(app);
     agent
       .get('/test')
       .end(() => {
         agent
-          .get('/ignored')
+          .get('/unknown')
           .end(() => {
             const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
 
             expect(metricHashMap['path:/test,status_code:200']).toBeDefined();
-            expect(metricHashMap['path:/ignored,status_code:200']).not.toBeDefined();
+            expect(metricHashMap['path:/unknown,status_code:404']).not.toBeDefined();
 
             agent
               .get('/metrics')
