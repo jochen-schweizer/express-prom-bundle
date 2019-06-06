@@ -13,6 +13,7 @@ declare namespace express_prom_bundle {
   }
 
   type StringOrRegExp = string | RegExp;
+  type ExcludeFn = (req: Request, res: Response) => boolean;
   type NormalizePathEntry = [StringOrRegExp, string];
   type NormalizePathFn = (req: Request, opts: Opts) => string;
   type NormalizeStatusCodeFn = (res: Response) => number | string;
@@ -23,6 +24,7 @@ declare namespace express_prom_bundle {
     buckets?: number[];
 
     excludeRoutes?: StringOrRegExp[];
+    excludeFn?: ExcludeFn;
 
     customLabels?: { [key: string]: any };
 

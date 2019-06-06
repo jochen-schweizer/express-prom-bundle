@@ -35,6 +35,8 @@ promBundle({
   buckets: [0.1, 0.4, 0.7],
 
   excludeRoutes: ['foo', /foo/],
+  excludeFn: (_req, _res) => false,
+
   includeMethod: true,
   includePath: true,
   customLabels: { year: null },
