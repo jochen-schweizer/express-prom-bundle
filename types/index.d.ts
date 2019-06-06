@@ -12,7 +12,8 @@ declare namespace express_prom_bundle {
     [key: string]: string | number;
   }
 
-  type NormalizePathEntry = [string | RegExp, string];
+  type StringOrRegExp = string | RegExp;
+  type NormalizePathEntry = [StringOrRegExp, string];
   type NormalizePathFn = (req: Request, opts: Opts) => string;
   type NormalizeStatusCodeFn = (res: Response) => number | string;
   type TransformLabelsFn = (labels: Labels, req: Request, res: Response) => Labels;
@@ -20,6 +21,8 @@ declare namespace express_prom_bundle {
   interface Opts {
     autoregister?: boolean;
     buckets?: number[];
+
+    excludeRoutes?: StringOrRegExp[];
 
     customLabels?: { [key: string]: any };
 

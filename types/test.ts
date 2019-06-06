@@ -33,6 +33,8 @@ promClient.register.clear();
 // $ExpectType RequestHandler
 promBundle({
   buckets: [0.1, 0.4, 0.7],
+
+  excludeRoutes: ['foo', /foo/],
   includeMethod: true,
   includePath: true,
   customLabels: { year: null },
