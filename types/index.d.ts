@@ -15,7 +15,7 @@ declare namespace express_prom_bundle {
   type NormalizePathEntry = [string | RegExp, string];
   type NormalizePathFn = (req: Request, opts: Opts) => string;
   type NormalizeStatusCodeFn = (res: Response) => number | string;
-  type TransformLabelsFn = (labels: Labels, req: Request, res: Response) => Labels;
+  type TransformLabelsFn = (labels: Labels, req: Request, res: Response) => void;
 
   interface Opts {
     autoregister?: boolean;
