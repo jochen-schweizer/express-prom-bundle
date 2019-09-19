@@ -1,7 +1,7 @@
 // TypeScript Version: 2.8
 
 import { Request, RequestHandler, Response } from 'express';
-import { DefaultMetricsCollectorConfiguration } from 'prom-client';
+import { DefaultMetricsCollectorConfiguration, Registry } from 'prom-client';
 
 export {};
 
@@ -31,6 +31,7 @@ declare namespace express_prom_bundle {
     metricType?: 'summary' | 'histogram';
     metricsPath?: string;
     promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration };
+    promRegistry?: Registry,
     normalizePath?: NormalizePathEntry[] | NormalizePathFn;
     formatStatusCode?: NormalizeStatusCodeFn;
     transformLabels?: TransformLabelsFn;

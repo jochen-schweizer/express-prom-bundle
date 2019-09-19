@@ -47,6 +47,7 @@ promBundle({
       timeout: 1000
     }
   },
+  promRegistry: new promClient.Registry(),
   urlValueParser: {
     minHexLength: 5,
     extraMasks: [
