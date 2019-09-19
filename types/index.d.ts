@@ -31,7 +31,7 @@ declare namespace express_prom_bundle {
     metricType?: 'summary' | 'histogram';
     metricsPath?: string;
     promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration };
-    promRegistry?: Registry,
+    promRegistry?: Registry;
     normalizePath?: NormalizePathEntry[] | NormalizePathFn;
     formatStatusCode?: NormalizeStatusCodeFn;
     transformLabels?: TransformLabelsFn;
