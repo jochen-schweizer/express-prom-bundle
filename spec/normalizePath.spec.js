@@ -17,7 +17,7 @@ describe('normalizePath', () => {
         ['[^/]+$','happy'],
       ]
     });
-    expect(result).toBe('/goodbye/world/i/am/finally/happy');
+    expect(result).toBe('/goodbye/world/i/am/finally/free!!!');
   });
 
   it('throws error is bad tuples provided as normalizePath', () => {

@@ -19,7 +19,10 @@ module.exports = function(req, opts) {
         throw new Error('Bad tuple provided in normalizePath option, expected: [regex, replacement]');
       }
       const regex = typeof tuple[0] === 'string' ? RegExp(tuple[0]) : tuple[0];
-      path = path.replace(regex, tuple[1]);
+      if (path.match(regex)) {
+        path = path.replace(regex, tuple[1]);
+        break;
+      }
     }
   }
 
