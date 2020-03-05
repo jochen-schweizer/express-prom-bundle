@@ -443,11 +443,10 @@ describe('index', () => {
     bundle({
       promClient: {
         collectDefaultMetrics: {
-          timeout: 3000
         }
       }
     });
-    expect(spy).toHaveBeenCalledWith({timeout: 3000});
+    expect(spy).toHaveBeenCalledWith({});
   });
 
   describe('usage of clusterMetrics()', () => {
