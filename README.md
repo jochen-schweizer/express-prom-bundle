@@ -243,7 +243,6 @@ while replacing all HEX values starting from 5 characters and all IP addresses i
             "buckets": [0.1, 1, 5],
             "promClient": {
               "collectDefaultMetrics": {
-                "timeout": 2000
               }
             },
             "urlValueParser": {

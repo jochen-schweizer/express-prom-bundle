@@ -44,7 +44,6 @@ promBundle({
   metricsPath: '/prometheus',
   promClient: {
     collectDefaultMetrics: {
-      timeout: 1000
     }
   },
   urlValueParser: {
