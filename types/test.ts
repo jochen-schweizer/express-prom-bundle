@@ -3,7 +3,7 @@ import * as promClient from 'prom-client';
 
 import * as promBundle from 'express-prom-bundle';
 
-// $ExpectType RequestHandler
+// $ExpectType Middleware
 const middleware: RequestHandler = promBundle({ includeMethod: true });
 
 // $ExpectType: string
@@ -11,7 +11,7 @@ middleware.name;
 
 promClient.register.clear();
 
-// $ExpectType RequestHandler
+// $ExpectType Middleware
 promBundle({
   normalizePath: [
     // collect paths like "/customer/johnbobson" as just one "/custom/#name"
@@ -30,7 +30,7 @@ promBundle({
 
 promClient.register.clear();
 
-// $ExpectType RequestHandler
+// $ExpectType Middleware
 promBundle({
   buckets: [0.1, 0.4, 0.7],
   includeMethod: true,
