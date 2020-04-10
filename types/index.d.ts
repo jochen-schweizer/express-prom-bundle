@@ -1,7 +1,7 @@
 // TypeScript Version: 2.8
 
 import { Request, RequestHandler, Response } from 'express';
-import { DefaultMetricsCollectorConfiguration } from 'prom-client';
+import { DefaultMetricsCollectorConfiguration, Registry } from 'prom-client';
 
 export {};
 
@@ -55,4 +55,12 @@ interface express_prom_bundle {
   normalizeStatusCode: express_prom_bundle.NormalizeStatusCodeFn;
 }
 
-declare function express_prom_bundle(opts: express_prom_bundle.Opts): RequestHandler;
+interface metricsMiddleware extends RequestHandler {}
+
+interface PromBundleRequestHandler extends RequestHandler {
+  metricsMiddleware: metricsMiddleware;
+  metric: {[key: string] : any};
+  promClient: Registry;
+}
+  
+declare function express_prom_bundle(opts: express_prom_bundle.Opts): PromBundleRequestHandler;
