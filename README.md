@@ -46,7 +46,7 @@ Which labels to include in `http_request_duration_seconds` metric:
 
 * **includeStatusCode**: HTTP status code (200, 400, 404 etc.), default: **true**
 * **includeMethod**: HTTP method (GET, PUT, ...), default: **false**
-* **includePath**: URL path (see importent details below), default: **false**
+* **includePath**: URL path (see important details below), default: **false**
 * **customLabels**: an object containing extra labels, e.g. ```{project_name: 'hello_world'}```.
   Most useful together with **transformLabels** callback, otherwise it's better to use native Prometheus relabeling.
 * **includeUp**: include an auxiliary "up"-metric which always returns 1, default: **true**
