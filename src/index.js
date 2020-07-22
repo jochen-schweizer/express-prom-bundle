@@ -50,7 +50,8 @@ function main(opts) {
       normalizePath: main.normalizePath,
       formatStatusCode: main.normalizeStatusCode,
       metricType: 'histogram',
-      promClient: {}
+      promClient: {},
+      promRegistry: promClient.register
     }, opts
   );
 
@@ -92,14 +93,16 @@ function main(opts) {
         labelNames: labels,
         percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999],
         maxAgeSeconds:  opts.maxAgeSeconds,
-        ageBuckets: opts.ageBuckets
+        ageBuckets: opts.ageBuckets,
+        registers: [opts.promRegistry]
       });
     } else if (opts.metricType === 'histogram' || !opts.metricType) {
       return new promClient.Histogram({
         name: httpMetricName,
         help: 'duration histogram of http responses labeled with: ' + labels.join(', '),
         labelNames: labels,
-        buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10]
+        buckets: opts.buckets || [0.003, 0.03, 0.1, 0.3, 1.5, 10],
+        registers: [opts.promRegistry]
       });
     } else {
       throw new Error('metricType option must be histogram or summary');
@@ -113,14 +116,15 @@ function main(opts) {
   if (opts.includeUp !== false) {
     metrics.up = new promClient.Gauge({
       name: 'up',
-      help: '1 = up, 0 = not up'
+      help: '1 = up, 0 = not up',
+      registers: [opts.promRegistry]
     });
     metrics.up.set(1);
   }
 
   const metricsMiddleware = function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end(promClient.register.metrics());
+    res.end(opts.promRegistry.metrics());
   };
 
   const metricsMatch = opts.metricsPath instanceof RegExp ? opts.metricsPath

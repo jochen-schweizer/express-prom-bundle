@@ -53,6 +53,7 @@ Which labels to include in `http_request_duration_seconds` metric:
 * **metricsPath**: replace the `/metrics` route with a **regex** or exact **string**. Note: it is highly recommended to just stick to the default
 * **metricType**: histogram/summary selection. See more details below
 
+
 ### metricType option ###
 
 Two metric types are supported for `http_request_duration_seconds` metric:
@@ -85,6 +86,7 @@ Additional options for **summary**:
 * **promClient**: options for promClient startup, e.g. **collectDefaultMetrics**. This option was added
   to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
   see [advanced example](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
+* **promRegistry**: Optional `promClient.Registry` instance to attach metrics to. Defaults to global `promClient.register`.
 
 ### More details on includePath option
 

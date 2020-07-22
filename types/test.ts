@@ -46,6 +46,7 @@ promBundle({
     collectDefaultMetrics: {
     }
   },
+  promRegistry: new promClient.Registry(),
   urlValueParser: {
     minHexLength: 5,
     extraMasks: [
