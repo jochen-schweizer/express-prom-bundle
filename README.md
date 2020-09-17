@@ -226,7 +226,7 @@ if (cluster.isMaster) {
 
 ## using with kraken.js
 
-Here is meddleware config sample, which can be used in a standard **kraken.js** application.
+Here is middleware config sample, which can be used in a standard **kraken.js** application.
 In this case the stats for URI paths and HTTP methods are collected separately,
 while replacing all HEX values starting from 5 characters and all IP addresses in the path as #val.
 
