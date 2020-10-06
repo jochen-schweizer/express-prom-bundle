@@ -30,6 +30,7 @@ declare namespace express_prom_bundle {
 
     metricType?: 'summary' | 'histogram';
     metricsPath?: string;
+    httpDurationMetricName?: string;
     promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration };
     promRegistry?: Registry;
     normalizePath?: NormalizePathEntry[] | NormalizePathFn;
