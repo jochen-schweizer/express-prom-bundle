@@ -46,6 +46,10 @@ declare namespace express_prom_bundle {
     };
   }
 
+  interface Middleware extends RequestHandler {
+    metricsMiddleware: RequestHandler;
+  }
+
   const normalizePath: NormalizePathFn;
   const normalizeStatusCode: NormalizeStatusCodeFn;
 
@@ -57,4 +61,4 @@ interface express_prom_bundle {
   normalizeStatusCode: express_prom_bundle.NormalizeStatusCodeFn;
 }
 
-declare function express_prom_bundle(opts: express_prom_bundle.Opts): RequestHandler;
+declare function express_prom_bundle(opts: express_prom_bundle.Opts): express_prom_bundle.Middleware;
