@@ -84,7 +84,7 @@ Additional options for **summary**:
 
 * **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
 * **promClient**: options for promClient startup, e.g. **collectDefaultMetrics**. This option was added
-  to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
+  to keep `express-prom-bundle` runnable using config (e.g. with kraken.js) without writing any JS code,
   see [advanced example](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
 * **promRegistry**: Optional `promClient.Registry` instance to attach metrics to. Defaults to global `promClient.register`.
 
@@ -226,7 +226,7 @@ if (cluster.isMaster) {
 
 ## using with kraken.js
 
-Here is meddleware config sample, which can be used in a standard **kraken.js** application.
+Here is middleware config sample, which can be used in a standard **kraken.js** application.
 In this case the stats for URI paths and HTTP methods are collected separately,
 while replacing all HEX values starting from 5 characters and all IP addresses in the path as #val.
 
