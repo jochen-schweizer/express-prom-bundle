@@ -131,6 +131,10 @@ function main(opts) {
     : new RegExp('^' + (opts.metricsPath || '/metrics') + '/?$');
 
   const middleware = function (req, res, next) {
+    if (opts.filter && opts.filter(req)) {
+      return next();
+    }
+
     const path = req.originalUrl || req.url; // originalUrl gets lost in koa-connect?
 
     if (opts.autoregister && path.match(metricsMatch)) {

@@ -28,6 +28,8 @@ declare namespace express_prom_bundle {
     includePath?: boolean;
     includeUp?: boolean;
 
+    filter?: (req: Request) => boolean;
+
     metricType?: 'summary' | 'histogram';
     metricsPath?: string;
     httpDurationMetricName?: string;
