@@ -204,12 +204,15 @@ describe('index', () => {
     const app = express();
     const instance = bundle({
       bypass: (req)=> {
-        return ['/test', /bad.word/].includes(req.url)
+        // metrics added here to attempt skipping /metrics
+        // this should fail though, because serving /metrics preceeds bypassing
+        return !!req.url.match(/test|bad.word|metrics/)
       }
     });
     app.use(instance);
     app.use('/test', (req, res) => res.send('it worked'));
     app.use('/some/bad-word', (req, res) => res.send('it worked too'));
+    app.use('/good-word', (req, res) => res.send('this will be counted'));
     const agent = supertest(app);
     agent
       .get('/test')
@@ -217,14 +220,21 @@ describe('index', () => {
         agent
           .get('/some/bad-word')
           .end(() => {
-            const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
-            expect(metricHashMap['status_code:200']).not.toBeDefined();
-
             agent
-              .get('/metrics')
-              .end((err, res) => {
-                expect(res.status).toBe(200);
-                done();
+              .get('/good-word')
+              .end(() => {
+                const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
+                expect(metricHashMap['status_code:200']).toBeDefined();
+
+                // only /good-word should be counted
+                expect(metricHashMap['status_code:200'].count).toBe(1);
+
+                agent
+                  .get('/metrics')
+                  .end((err, res) => {
+                    expect(res.status).toBe(200);
+                    done();
+                  });
               });
           });
       });
