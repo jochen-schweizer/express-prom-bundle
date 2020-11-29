@@ -52,7 +52,7 @@ Which labels to include in `http_request_duration_seconds` metric:
 * **includeUp**: include an auxiliary "up"-metric which always returns 1, default: **true**
 * **metricsPath**: replace the `/metrics` route with a **regex** or exact **string**. Note: it is highly recommended to just stick to the default
 * **metricType**: histogram/summary selection. See more details below
-* **filter**: whether the incoming request should be included in the metrics
+* **bypass**: Function which takes express request as an argument. Determines whether the given request should be included in the metrics or not, default: **() => false**
 
 ### metricType option ###
 

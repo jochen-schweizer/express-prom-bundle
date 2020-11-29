@@ -200,6 +200,36 @@ describe('index', () => {
       });
   });
 
+  it('bypass requests', done => {
+    const app = express();
+    const instance = bundle({
+      bypass: (req)=> {
+        return ['/test', /bad.word/].includes(req.url)
+      }
+    });
+    app.use(instance);
+    app.use('/test', (req, res) => res.send('it worked'));
+    app.use('/some/bad-word', (req, res) => res.send('it worked too'));
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/some/bad-word')
+          .end(() => {
+            const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
+            expect(metricHashMap['status_code:200']).not.toBeDefined();
+
+            agent
+              .get('/metrics')
+              .end((err, res) => {
+                expect(res.status).toBe(200);
+                done();
+              });
+          });
+      });
+  });
+
   it('complains about deprecated options', () => {
     expect(() => bundle({prefix: 'hello'})).toThrow();
   });

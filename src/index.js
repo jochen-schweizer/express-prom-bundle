@@ -131,7 +131,7 @@ function main(opts) {
     : new RegExp('^' + (opts.metricsPath || '/metrics') + '/?$');
 
   const middleware = function (req, res, next) {
-    if (opts.filter && opts.filter(req)) {
+    if (opts.bypass && opts.bypass(req)) {
       return next();
     }
 
