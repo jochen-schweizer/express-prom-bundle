@@ -20,14 +20,31 @@ function clusterMetrics() {
     const aggregatorRegistry = new promClient.AggregatorRegistry();
 
     const metricsMiddleware = function(req, res) {
-      aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
-        if (err) {
-            console.error(err);
-            return res.sendStatus(500);
-        }
+      function sendClusterMetrics(clusterMetrics) {
         res.set('Content-Type', aggregatorRegistry.contentType);
         res.send(clusterMetrics);
+      }
+
+      function sendClusterMetricsError(err) {
+        console.error(err);
+        return res.sendStatus(500);
+      }
+
+      // since prom-client@13 clusterMetrics() method doesn't take cb param,
+      // but we provide it anyway, as at this stage it's unknown which version of prom-client is used
+      const response = aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
+        if (err) {
+          return sendClusterMetricsError(err);
+        }
+        sendClusterMetrics(clusterMetrics);
       });
+
+      // if we find out that it was a promise and our cb was useless...
+      if (response && response.then) {
+        response
+          .then(result => sendClusterMetrics(result))
+          .catch(err => sendClusterMetricsError(err));
+      }
     };
 
     return metricsMiddleware;
@@ -122,9 +139,19 @@ function main(opts) {
     metrics.up.set(1);
   }
 
-  const metricsMiddleware = function(req, res) {
+  const metricsMiddleware = function(req, res, next) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end(opts.promRegistry.metrics());
+
+    const metricsResponse = opts.promRegistry.metrics();
+    // starting from prom-client@13 .metrics() returns a Promise
+    if (metricsResponse.then) {
+      metricsResponse
+        .then(output => res.end(output))
+        .catch(err => next(err));
+    } else {
+      // compatibility fallback for previous versions of prom-client@<=12
+      res.end(metricsResponse);
+    }
   };
 
   const metricsMatch = opts.metricsPath instanceof RegExp ? opts.metricsPath
