@@ -17,37 +17,37 @@ function matchVsRegExps(element, regexps) {
 }
 
 function clusterMetrics() {
-    const aggregatorRegistry = new promClient.AggregatorRegistry();
+  const aggregatorRegistry = new promClient.AggregatorRegistry();
 
-    const metricsMiddleware = function(req, res) {
-      function sendClusterMetrics(clusterMetrics) {
-        res.set('Content-Type', aggregatorRegistry.contentType);
-        res.send(clusterMetrics);
+  const metricsMiddleware = function(req, res) {
+    function sendClusterMetrics(clusterMetrics) {
+      res.set('Content-Type', aggregatorRegistry.contentType);
+      res.send(clusterMetrics);
+    }
+
+    function sendClusterMetricsError(err) {
+      console.error(err);
+      return res.sendStatus(500);
+    }
+
+    // since prom-client@13 clusterMetrics() method doesn't take cb param,
+    // but we provide it anyway, as at this stage it's unknown which version of prom-client is used
+    const response = aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
+      if (err) {
+        return sendClusterMetricsError(err);
       }
+      sendClusterMetrics(clusterMetrics);
+    });
 
-      function sendClusterMetricsError(err) {
-        console.error(err);
-        return res.sendStatus(500);
-      }
+    // if we find out that it was a promise and our cb was useless...
+    if (response && response.then) {
+      response
+        .then(result => sendClusterMetrics(result))
+        .catch(err => sendClusterMetricsError(err));
+    }
+  };
 
-      // since prom-client@13 clusterMetrics() method doesn't take cb param,
-      // but we provide it anyway, as at this stage it's unknown which version of prom-client is used
-      const response = aggregatorRegistry.clusterMetrics((err, clusterMetrics) => {
-        if (err) {
-          return sendClusterMetricsError(err);
-        }
-        sendClusterMetrics(clusterMetrics);
-      });
-
-      // if we find out that it was a promise and our cb was useless...
-      if (response && response.then) {
-        response
-          .then(result => sendClusterMetrics(result))
-          .catch(err => sendClusterMetricsError(err));
-      }
-    };
-
-    return metricsMiddleware;
+  return metricsMiddleware;
 }
 
 function main(opts) {
@@ -161,7 +161,7 @@ function main(opts) {
     const path = req.originalUrl || req.url; // originalUrl gets lost in koa-connect?
 
     if (opts.autoregister && path.match(metricsMatch)) {
-        return metricsMiddleware(req, res);
+      return metricsMiddleware(req, res);
     }
 
     // bypass() is checked only after /metrics was processed
