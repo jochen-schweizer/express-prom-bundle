@@ -17,6 +17,7 @@
   "extends": "eslint:recommended",
 
   "rules": {
+    "indent": [1, 2],
     "array-bracket-spacing": [2, "never"],
     "block-scoped-var": 2,
     "brace-style": [2, "1tbs"],
