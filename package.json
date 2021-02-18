@@ -19,7 +19,8 @@
     "test": "node_modules/jasme/run.js",
     "lint": "eslint src",
     "coverage": "make coverage",
-    "dtslint": "dtslint types"
+    "dtslint": "dtslint types",
+    "dtslint-next": "dtslint --onlyTestTsNext types"
   },
   "author": "Konstantin Pogorelov <or@pluseq.com>",
   "license": "MIT",

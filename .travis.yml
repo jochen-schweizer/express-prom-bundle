@@ -10,4 +10,4 @@ before_install:
 script:
     - npm run lint
     - npm test
-    - npm run dtslint
+    - npm run dtslint-next
