@@ -17,6 +17,7 @@
   "types": "types",
   "scripts": {
     "test": "node_modules/jasme/run.js",
+    "lint": "eslint src",
     "coverage": "make coverage",
     "dtslint": "dtslint types"
   },
