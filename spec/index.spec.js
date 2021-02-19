@@ -409,6 +409,27 @@ describe('index', () => {
       });
   });
 
+  it('handles errors in collectors', done => {
+    const app = express();
+    const instance = bundle({});
+    app.use(instance);
+
+    spyOn(console, 'error'); // mute console.error
+
+    new promClient.Gauge({
+      name: 'kaboom',
+      help: 'this metric explodes',
+      collect() {
+        throw new Error('kaboom!');
+      }
+    });
+
+    supertest(app)
+      .get('/metrics')
+      .expect(500)
+      .end((err) => done(err));
+  });
+
   it('customLabels={foo: "bar"} adds foo="bar" label to metrics', done => {
     const app = express();
     const instance = bundle({
