@@ -1,7 +1,7 @@
 .PHONY: coverage
 
 test:
-	./node_modules/jasme/run.js
+	npm test
 lint:
 	node_modules/eslint/bin/eslint.js src
 	node_modules/.bin/dtslint types

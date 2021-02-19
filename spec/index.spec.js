@@ -414,8 +414,6 @@ describe('index', () => {
     const instance = bundle({});
     app.use(instance);
 
-    spyOn(console, 'error'); // mute console.error
-
     new promClient.Gauge({
       name: 'kaboom',
       help: 'this metric explodes',
@@ -423,6 +421,8 @@ describe('index', () => {
         throw new Error('kaboom!');
       }
     });
+
+    // the error will NOT be displayed if NODE_ENV=test (as defined in package.json)
 
     supertest(app)
       .get('/metrics')
