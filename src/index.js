@@ -140,17 +140,20 @@ function main(opts) {
   }
 
   const metricsMiddleware = function(req, res, next) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
+    const sendSuccesss = (output) => {
+      res.writeHead(200, {'Content-Type': 'text/plain'});
+      res.end(output);
+    };
 
     const metricsResponse = opts.promRegistry.metrics();
     // starting from prom-client@13 .metrics() returns a Promise
     if (metricsResponse.then) {
       metricsResponse
-        .then(output => res.end(output))
+        .then(output => sendSuccesss(output))
         .catch(err => next(err));
     } else {
       // compatibility fallback for previous versions of prom-client@<=12
-      res.end(metricsResponse);
+      sendSuccesss(metricsResponse);
     }
   };
 
@@ -161,7 +164,7 @@ function main(opts) {
     const path = req.originalUrl || req.url; // originalUrl gets lost in koa-connect?
 
     if (opts.autoregister && path.match(metricsMatch)) {
-      return metricsMiddleware(req, res);
+      return metricsMiddleware(req, res, next);
     }
 
     // bypass() is checked only after /metrics was processed
