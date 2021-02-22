@@ -43,8 +43,8 @@ declare namespace express_prom_bundle {
     urlValueParser?: {
       minHexLength?: number;
       minBase64Length?: number;
-      replaceMasks?: string[];
-      extraMasks?: string[];
+      replaceMasks?: (RegExp | string)[];
+      extraMasks?: (RegExp | string)[];
     };
   }
 
