@@ -19,7 +19,8 @@ const bundle = promBundle({
   urlValueParser: {
     minHexLength: 5,
     extraMasks: [
-      "^[0-9]+\\.[0-9]+\\.[0-9]+$" // replace dot-separated dates with #val
+      "^[0-9]+\\.[0-9]+\\.[0-9]+$", // replace dot-separated dates with #val, (regex as string)
+      /^[0-9]+\-[0-9]+\-[0-9]+$/ // replace dash-separated dates with #val (actual regex)
     ]
   },
   normalizePath: [
