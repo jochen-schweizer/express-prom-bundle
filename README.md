@@ -53,6 +53,7 @@ Which labels to include in `http_request_duration_seconds` metric:
 * **metricsPath**: replace the `/metrics` route with a **regex** or exact **string**. Note: it is highly recommended to just stick to the default
 * **metricType**: histogram/summary selection. See more details below
 * **bypass**: function taking express request as an argument and determines whether the given request should be excluded in the metrics, default: **() => false**
+* **httpDurationMetricName**: Allows you change the name of HTTP duration metric, default: **`http_request_duration_seconds`**.
 
 ### metricType option ###
 
