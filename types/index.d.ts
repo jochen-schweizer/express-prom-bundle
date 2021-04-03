@@ -19,7 +19,6 @@ declare namespace express_prom_bundle {
 
   interface Opts {
     autoregister?: boolean;
-    buckets?: number[];
 
     customLabels?: { [key: string]: any };
 
@@ -31,6 +30,15 @@ declare namespace express_prom_bundle {
     bypass?: (req: Request) => boolean;
 
     metricType?: 'summary' | 'histogram';
+
+    // https://github.com/siimon/prom-client#histogram
+    buckets?: number[];
+
+    // https://github.com/siimon/prom-client#summary
+    percentiles?: number[];
+    maxAgeSeconds?: number;
+    ageBuckets?: number;
+
     metricsPath?: string;
     httpDurationMetricName?: string;
     promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration };

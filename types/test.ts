@@ -40,7 +40,7 @@ promBundle({
     ...labels,
     year: new Date().getFullYear()
   }),
-  metricType: 'summary',
+  metricType: 'histogram',
   metricsPath: '/prometheus',
   promClient: {
     collectDefaultMetrics: {
@@ -57,6 +57,21 @@ promBundle({
     ['^/foo', '/example'] // replace /foo with /example
   ],
   formatStatusCode: (res: Response) => res.statusCode + 100
+});
+
+promClient.register.clear();
+
+promBundle({
+  metricType: 'summary',
+  maxAgeSeconds: 600,
+  ageBuckets: 5
+});
+
+promClient.register.clear();
+
+promBundle({
+  metricType: 'summary',
+  percentiles: [0.01, 0.1, 0.9, 0.99]
 });
 
 // TypeScript workaround to write a readonly field
