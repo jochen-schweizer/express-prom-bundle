@@ -28,4 +28,9 @@ describe('normalizePath', () => {
     });
     expect(subject).toThrow();
   });
+
+  it('uses urlPathReplacement when passed to transform the path', () => {
+    expect(normalizePath({url: '/a/12345'}, {urlPathReplacement: ':id'}))
+      .toBe('/a/:id');
+  });
 });
