@@ -29,6 +29,8 @@ declare namespace express_prom_bundle {
 
     bypass?: (req: Request) => boolean;
 
+    excludeRoutes?: Array<string | RegExp>;
+
     metricType?: 'summary' | 'histogram';
 
     // https://github.com/siimon/prom-client#histogram
