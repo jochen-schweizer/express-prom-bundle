@@ -172,6 +172,38 @@ describe('index', () => {
       });
   });
 
+  it('filters out everything except the onlyIncludeRoutes', async done => {
+    const app = express();
+    const instance = bundle({
+      includePath: true,
+      onlyIncludeRoutes: ['/test1', '/test1/', /^\/test2\/?$/]
+    });
+    app.use(instance);
+    app.use('/test1', (req, res) => res.send('it works 1'));
+    app.use('/test2', (req, res) => res.send('it works 2'));
+    app.use('/test3', (req, res) => res.send('it works 3'));
+    const agent = supertest(app);
+
+    try {
+      await agent.get('/test1').expect(200);
+      await agent.get('/test1/').expect(200);
+      await agent.get('/test2').expect(200);
+      await agent.get('/test2/').expect(200);
+      await agent.get('/test3').expect(200);
+      await agent.get('/test3/').expect(200);
+
+      const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
+      expect(metricHashMap['path:/test1,status_code:200'].count).toBe(2);
+      expect(metricHashMap['path:/test2,status_code:200'].count).toBe(2);
+      expect(metricHashMap['path:/test3,status_code:200']).not.toBeDefined();
+
+      await agent.get('/metrics').expect(200);
+      done();
+    } catch (err) {
+      done.fail(err);
+    }
+  });
+
   it('filters out the excludeRoutes', done => {
     const app = express();
     const instance = bundle({

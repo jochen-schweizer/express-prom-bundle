@@ -20,6 +20,7 @@ promBundle({
     // collect paths like "/bobjohnson/order-list" as just one "/#name/order-list"
     ['^.*/order-list', '/#name/order-list']
   ],
+  onlyIncludeRoutes: ['/foo', '/foo/', /^\/bar\/?$/],
   urlValueParser: {
     minHexLength: 5,
     extraMasks: [

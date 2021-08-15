@@ -173,6 +173,10 @@ function main(opts) {
       return next();
     }
 
+    if (opts.onlyIncludeRoutes && !matchVsRegExps(path, opts.onlyIncludeRoutes)) {
+      return next();
+    }
+
     if (opts.excludeRoutes && matchVsRegExps(path, opts.excludeRoutes)) {
       return next();
     }

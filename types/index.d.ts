@@ -27,6 +27,8 @@ declare namespace express_prom_bundle {
     includePath?: boolean;
     includeUp?: boolean;
 
+    onlyIncludeRoutes?: Array<string | RegExp>;
+
     bypass?: (req: Request) => boolean;
 
     metricType?: 'summary' | 'histogram';
