@@ -35,6 +35,7 @@ promBundle({
   buckets: [0.1, 0.4, 0.7],
   includeMethod: true,
   includePath: true,
+  excludeRoutes: ['/foo', /^\/bar\/?$/],
   customLabels: { year: null },
   transformLabels: (labels: promBundle.Labels) => ({
     ...labels,
