@@ -48,6 +48,7 @@ declare namespace express_prom_bundle {
     normalizePath?: NormalizePathEntry[] | NormalizePathFn;
     formatStatusCode?: NormalizeStatusCodeFn;
     transformLabels?: TransformLabelsFn;
+    urlPathReplacement?: string;
 
     // https://github.com/disjunction/url-value-parser#options
     urlValueParser?: {
