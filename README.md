@@ -80,10 +80,11 @@ Additional options for **summary**:
   See the [docs](https://github.com/disjunction/url-value-parser) of url-value-parser module for details.
 * **formatStatusCode**: `function(res)` producing final status code from express `res` object, e.g. you can combine `200`, `201` and `204` to just `2xx`.
 * **transformLabels**: `function(labels, req, res)` transforms the **labels** object, e.g. setting dynamic values to **customLabels**
+* **urlPathReplacement**: replacement string for the values (default: "#val")
 
 ### Other options ###
 
-* **autoregister**: if `/metrics` endpoint should be registered. (Default: **true**)
+* **autoregister**: if `/metrics` endpoint should be registered (default: **true**)
 * **promClient**: options for promClient startup, e.g. **collectDefaultMetrics**. This option was added
   to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
   see [advanced example](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
