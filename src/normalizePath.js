@@ -11,6 +11,7 @@ module.exports = function(req, opts) {
   // by middlewares such as 'router'. Note: this function is called onFinish
   /// i.e. always in the tail of the middleware chain
   let path = url.parse(req.originalUrl || req.url).pathname;
+  const urlPathReplacement = opts ? opts.urlPathReplacement : '#val';
 
   const normalizePath = opts && opts.normalizePath;
   if (Array.isArray(normalizePath)) {
@@ -26,5 +27,5 @@ module.exports = function(req, opts) {
   if (!urlValueParser) {
     urlValueParser = new UrlValueParser(opts && opts.urlValueParser);
   }
-  return urlValueParser.replacePathValues(path);
+  return urlValueParser.replacePathValues(path, urlPathReplacement);
 };
