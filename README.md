@@ -199,7 +199,8 @@ which returns an aggregate of all metrics from all the workers.
 
 ``` javascript
 const cluster = require('cluster');
-const promBundle = require('./src/index');
+const promBundle = require('express-prom-bundle');
+const promClient = require('prom-client');
 const numCPUs = Math.max(2, require('os').cpus().length);
 const express = require('express');
 
@@ -215,6 +216,7 @@ if (cluster.isMaster) {
     console.log('cluster metrics listening on 9999');
     console.log('call localhost:9999/metrics for aggregated metrics');
 } else {
+    new promClient.AggregatorRegistry();
     const app = express();
     app.use(promBundle({
         autoregister: false, // disable /metrics for single workers
