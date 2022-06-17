@@ -68,7 +68,8 @@ function main(opts) {
       formatStatusCode: main.normalizeStatusCode,
       metricType: 'histogram',
       promClient: {},
-      promRegistry: promClient.register
+      promRegistry: promClient.register,
+      metricsApp: null,
     }, opts
   );
 
@@ -203,6 +204,13 @@ function main(opts) {
 
     next();
   };
+
+  if (opts.metricsApp) {
+    opts.metricsApp.get(opts.metricsPath || '/metrics', async (req, res, next) => {
+      res.set('Content-Type', opts.promRegistry.contentType);
+      return res.end(await opts.promRegistry.metrics());
+    });
+  }
 
   middleware.metrics = metrics;
   middleware.promClient = promClient;
