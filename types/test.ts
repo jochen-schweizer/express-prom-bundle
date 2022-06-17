@@ -1,10 +1,11 @@
-import { Request, RequestHandler, Response } from 'express';
+import * as express from 'express';
+
 import * as promClient from 'prom-client';
 
 import * as promBundle from 'express-prom-bundle';
 
 // $ExpectType Middleware
-const middleware: RequestHandler = promBundle({ includeMethod: true });
+const middleware: express.RequestHandler = promBundle({ includeMethod: true });
 
 // $ExpectType: string
 middleware.name;
@@ -57,7 +58,8 @@ promBundle({
   normalizePath: [
     ['^/foo', '/example'] // replace /foo with /example
   ],
-  formatStatusCode: (res: Response) => res.statusCode + 100
+  formatStatusCode: (res: express.Response) => res.statusCode + 100,
+  metricsApp: express()
 });
 
 promClient.register.clear();
@@ -79,14 +81,14 @@ promBundle({
 type Writable<T> = { -readonly [K in keyof T]: T[K] };
 const wPromBundle: Writable<promBundle> = promBundle;
 
-wPromBundle.normalizePath = (req: Request, opts: promBundle.Opts) => {
+wPromBundle.normalizePath = (req: express.Request, opts: promBundle.Opts) => {
   const path = promBundle.normalizePath(req, opts);
 
   // count all docs as one path, but /docs/login as a separate one
   return path.match(/^\/docs/) && !path.match(/^\/login/) ? '/docs/*' : path;
 };
 
-wPromBundle.normalizeStatusCode = (res: Response) => res.statusCode.toString();
+wPromBundle.normalizeStatusCode = (res: express.Response) => res.statusCode.toString();
 
 // $ExpectType RequestHandler
 promBundle.clusterMetrics();
