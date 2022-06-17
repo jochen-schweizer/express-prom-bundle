@@ -591,7 +591,7 @@ describe('index', () => {
       });
     });
 
-    fit('additional metricsApp can be used', done => {
+    it('additional metricsApp can be used', done => {
       const app = express();
       const metricsApp = express();
       const bundled = bundle({metricsApp});
