@@ -1,6 +1,6 @@
 // TypeScript Version: 2.8
 
-import { Request, RequestHandler, Response } from 'express';
+import { Request, RequestHandler, Response, Express } from 'express';
 import { DefaultMetricsCollectorConfiguration, Registry } from 'prom-client';
 
 export {};
@@ -49,6 +49,7 @@ declare namespace express_prom_bundle {
     formatStatusCode?: NormalizeStatusCodeFn;
     transformLabels?: TransformLabelsFn;
     urlPathReplacement?: string;
+    metricsApp?: Express;
 
     // https://github.com/disjunction/url-value-parser#options
     urlValueParser?: {
