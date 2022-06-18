@@ -206,9 +206,10 @@ function main(opts) {
   };
 
   if (opts.metricsApp) {
-    opts.metricsApp.get(opts.metricsPath || '/metrics', async (req, res, next) => {
+    opts.metricsApp.get(opts.metricsPath || '/metrics', (req, res) => {
       res.set('Content-Type', opts.promRegistry.contentType);
-      return res.end(await opts.promRegistry.metrics());
+      opts.promRegistry.metrics()
+        .then(metrics => res.end(metrics));
     });
   }
 

@@ -206,7 +206,7 @@ describe('index', () => {
       bypass: (req)=> {
         // metrics added here to attempt skipping /metrics
         // this should fail though, because serving /metrics preceeds bypassing
-        return !!req.url.match(/test|bad.word|metrics/)
+        return !!req.url.match(/test|bad.word|metrics/);
       }
     });
     app.use(instance);
@@ -512,18 +512,18 @@ describe('index', () => {
 
   describe('usage of clusterMetrics()', () => {
     it('clusterMetrics returns 200 even without a cluster', (done) => {
-        const app = express();
+      const app = express();
 
-        cluster.workers = [];
+      cluster.workers = [];
 
-        app.use('/cluster_metrics', bundle.clusterMetrics());
-        const agent = supertest(app);
-        agent
-          .get('/cluster_metrics')
-          .end((err, res) => {
-            expect(res.status).toBe(200);
-            done();
-          });
+      app.use('/cluster_metrics', bundle.clusterMetrics());
+      const agent = supertest(app);
+      agent
+        .get('/cluster_metrics')
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          done();
+        });
     });
 
     it('clusterMetrics returns 500 in case of an error', (done) => {

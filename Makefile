@@ -3,8 +3,8 @@
 test:
 	npm test
 lint:
-	node_modules/eslint/bin/eslint.js src
-	node_modules/.bin/dtslint types
+	npx eslint src
+	npm run dtslint-next
 coverage:
 	node_modules/istanbul/lib/cli.js cover \
 		-i 'src/*' \
