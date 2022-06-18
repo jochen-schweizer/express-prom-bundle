@@ -590,5 +590,23 @@ describe('index', () => {
           });
       });
     });
+
+    it('additional metricsApp can be used', done => {
+      const app = express();
+      const metricsApp = express();
+      const bundled = bundle({metricsApp});
+
+      app.use(bundled);
+
+      const agent = supertest(app);
+      const metricsAgent = supertest(metricsApp);
+      agent.get('/').end(() => {
+        metricsAgent.get('/metrics').end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.text).toMatch(/status_code="404"/);
+          done();
+        });
+      });
+    });
   });
 });

@@ -89,6 +89,7 @@ Additional options for **summary**:
   to keep `express-prom-bundle` runnable using confit (e.g. with kraken.js) without writing any JS code,
   see [advanced example](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
 * **promRegistry**: Optional `promClient.Registry` instance to attach metrics to. Defaults to global `promClient.register`.
+* **metricsApp**: Allows you to attach the metrics endpoint to a different express app. You probably want to use it in combination with `autoregister: false`.
 
 ### More details on includePath option
 
