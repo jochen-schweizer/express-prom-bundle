@@ -142,6 +142,17 @@ promBundle.normalizePath = (req, opts) => {
 };
 ```
 
+#### Example 3 (return express route definition):
+
+```javascript
+app.use(promBundle(/* options? */));
+
+promBundle.normalizePath = (req, opts) => {
+  // Return the path of the express route (i.e. /v1/member/:id or /v1/timer/automated/:userid/:timerid")
+  return req.route?.path ?? "NULL";
+};
+```
+
 For more details:
  * [url-value-parser](https://www.npmjs.com/package/url-value-parser) - magic behind automatic path normalization
  * [normalizePath.js](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/src/normalizePath.js) - source code for path processing
