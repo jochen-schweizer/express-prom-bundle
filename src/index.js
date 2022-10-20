@@ -16,6 +16,17 @@ function matchVsRegExps(element, regexps) {
   return false;
 }
 
+function getPrismaMetrics(prismaClient){
+  try {
+    if(prismaClient){
+      return prismaClient.$metrics.prometheus();
+    } 
+  } catch(err){
+    console.error(err)
+  }
+  return Promise.resolve([])  
+}
+
 function clusterMetrics() {
   const aggregatorRegistry = new promClient.AggregatorRegistry();
 
@@ -70,6 +81,7 @@ function main(opts) {
       promClient: {},
       promRegistry: promClient.register,
       metricsApp: null,
+      prismaClient: null,
     }, opts
   );
 
@@ -146,15 +158,16 @@ function main(opts) {
       res.end(output);
     };
 
-    const metricsResponse = opts.promRegistry.metrics();
+    const prismaResp = getPrismaMetrics(opts.prismaClient)
+    const metricsResponse = opts.promRegistry.metrics();    
     // starting from prom-client@13 .metrics() returns a Promise
     if (metricsResponse.then) {
-      metricsResponse
-        .then(output => sendSuccesss(output))
-        .catch(err => next(err));
+      Promise.all([metricsResponse, prismaResp]).then(
+        output => sendSuccesss(output[0] + output[1])
+      ).catch(err => next(err))
     } else {
       // compatibility fallback for previous versions of prom-client@<=12
-      sendSuccesss(metricsResponse);
+      prismaResp.then((output) => sendSuccesss(metricsResponse + output)).catch(err => next(err));
     }
   };
 
