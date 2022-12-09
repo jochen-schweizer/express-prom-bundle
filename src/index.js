@@ -182,6 +182,10 @@ function main(opts) {
     const timer = metrics[httpMetricName].startTimer(labels);
 
     onFinished(res, () => {
+      if (opts.bypassOnFinish && opts.bypassOnFinish(req, res)) {
+        return;
+      }
+
       if (opts.includeStatusCode) {
         labels.status_code = opts.formatStatusCode(res, opts);
       }

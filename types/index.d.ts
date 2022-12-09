@@ -28,6 +28,7 @@ declare namespace express_prom_bundle {
     includeUp?: boolean;
 
     bypass?: (req: Request) => boolean;
+    bypassOnFinish?: (req: Request, res: Response) => boolean;
 
     excludeRoutes?: Array<string | RegExp>;
 

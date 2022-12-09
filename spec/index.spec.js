@@ -240,6 +240,44 @@ describe('index', () => {
       });
   });
 
+  it('bypass requests, checking res', done => {
+    const app = express();
+    const instance = bundle({
+      bypassOnFinish: (req, res) => res.statusCode === 404,
+    });
+    app.use(instance);
+    app.use('/200', (req, res) => res.send(''));
+    app.use('/404', (req, res) => res.status(404).send(''));
+    app.use('/500', (req, res) => res.status(500).send(''));
+
+    const agent = supertest(app);
+    agent.get('/200')
+      .expect(200)
+      .then(() => {
+        return agent
+          .get('/404')
+          .expect(404);
+      })
+      .then(() => {
+        return agent
+          .get('/500')
+          .expect(500);
+      })
+      .then(() => {
+        const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
+
+        // only /200 and /500 should be counted
+        expect(metricHashMap['status_code:200'].count).toBe(1);
+        expect(metricHashMap['status_code:404']).not.toBeDefined();
+        expect(metricHashMap['status_code:500'].count).toBe(1);
+
+        return agent
+          .get('/metrics')
+          .expect(200);
+      })
+      .then(done);
+  });
+
   it('complains about deprecated options', () => {
     expect(() => bundle({prefix: 'hello'})).toThrow();
   });
