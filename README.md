@@ -52,8 +52,6 @@ Which labels to include in `http_request_duration_seconds` metric:
 * **includeUp**: include an auxiliary "up"-metric which always returns 1, default: **true**
 * **metricsPath**: replace the `/metrics` route with a **regex** or exact **string**. Note: it is highly recommended to just stick to the default
 * **metricType**: histogram/summary selection. See more details below
-* **bypass**: function taking express request as an argument and determines whether the given request should be excluded in the metrics, default: **() => false**
-* **bypassOnFinish**: function taking express request and response as arguments and determines whether the given request should be excluded in the metrics, default: **() => false**. Prefer using **bypass** if you don't need the response object.
 * **httpDurationMetricName**: Allows you change the name of HTTP duration metric, default: **`http_request_duration_seconds`**.
 
 ### metricType option ###
@@ -91,6 +89,19 @@ Additional options for **summary**:
   see [advanced example](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/advanced-example.js)
 * **promRegistry**: Optional `promClient.Registry` instance to attach metrics to. Defaults to global `promClient.register`.
 * **metricsApp**: Allows you to attach the metrics endpoint to a different express app. You probably want to use it in combination with `autoregister: false`.
+* **bypass**: An object that takes onRequest and onFinish callbacks that determines whether the given request should be excluded in the metrics. Default:
+
+  ```js
+  {
+    onRequest: (req) => false,
+    onFinish: (req, res) => false
+  }
+  ```
+
+  `onRequest` is run directly in the middleware chain, before the request is processed. `onFinish` is run after the request has been processed, and has access to the express response object in addition to the request object. Both callbacks are optional, and if one or both returns true the request is excluded.
+
+  As a shorthand, just the onRequest callback can be used instead of the object.
+
 
 ### More details on includePath option
 

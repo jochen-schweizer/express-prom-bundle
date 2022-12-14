@@ -243,7 +243,9 @@ describe('index', () => {
   it('bypass requests, checking res', done => {
     const app = express();
     const instance = bundle({
-      bypassOnFinish: (req, res) => res.statusCode === 404,
+      bypass: {
+        onFinish: (req, res) => res.statusCode === 404
+      }
     });
     app.use(instance);
     app.use('/200', (req, res) => res.send(''));
