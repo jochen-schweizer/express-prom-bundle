@@ -161,6 +161,14 @@ function main(opts) {
   const metricsMatch = opts.metricsPath instanceof RegExp ? opts.metricsPath
     : new RegExp('^' + (opts.metricsPath || '/metrics') + '/?$');
 
+  if (typeof opts.bypass === 'function') {
+    opts.bypass = {
+      onRequest: opts.bypass
+    };
+  } else if (!opts.bypass) {
+    opts.bypass = {};
+  }
+
   const middleware = function (req, res, next) {
     const path = req.originalUrl || req.url; // originalUrl gets lost in koa-connect?
 
@@ -170,7 +178,7 @@ function main(opts) {
 
     // bypass() is checked only after /metrics was processed
     // if you wish to disable /metrics use autoregister:false instead
-    if (opts.bypass && opts.bypass(req)) {
+    if (opts.bypass.onRequest && opts.bypass.onRequest(req)) {
       return next();
     }
 
@@ -182,6 +190,10 @@ function main(opts) {
     const timer = metrics[httpMetricName].startTimer(labels);
 
     onFinished(res, () => {
+      if (opts.bypass.onFinish && opts.bypass.onFinish(req, res)) {
+        return;
+      }
+
       if (opts.includeStatusCode) {
         labels.status_code = opts.formatStatusCode(res, opts);
       }
