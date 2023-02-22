@@ -449,6 +449,27 @@ describe('index', () => {
       });
   });
 
+  it('includeGeneralizedStatusCode=true adds generalized_status_code label from metrics', done => {
+    const app = express();
+    const instance = bundle({
+      includeGeneralizedStatusCode: true
+    });
+    app.use(instance);
+    app.use('/test', (req, res) => res.status(202).send('it worked'));
+    const agent = supertest(app);
+    agent
+      .get('/test')
+      .end(() => {
+        agent
+          .get('/metrics')
+          .end((err, res) => {
+            expect(res.status).toBe(200);
+            expect(res.text).not.toMatch(/="2XX"/);
+            done();
+          });
+      });
+  });
+
   it('handles errors in collectors', done => {
     const app = express();
     const instance = bundle({});

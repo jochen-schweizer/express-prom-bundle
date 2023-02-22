@@ -45,6 +45,7 @@ See the example below.
 Which labels to include in `http_request_duration_seconds` metric:
 
 * **includeStatusCode**: HTTP status code (200, 400, 404 etc.), default: **true**
+* **includeGeneralizedStatusCode**: HTTP status code (2XX, 4XX, 5XX), default: **false**
 * **includeMethod**: HTTP method (GET, PUT, ...), default: **false**
 * **includePath**: URL path (see important details below), default: **false**
 * **customLabels**: an object containing extra labels, e.g. ```{project_name: 'hello_world'}```.

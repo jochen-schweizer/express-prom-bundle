@@ -50,6 +50,23 @@ function clusterMetrics() {
   return metricsMiddleware;
 }
 
+
+function generalizeStatusCode(status) {
+  if (status >= 200 && status < 300) {
+    return '2XX';
+  }
+  if (status >= 300 && status < 400) {
+    return '3XX';
+  }
+  if (status >= 400 && status < 500) {
+    return '4XX';
+  }
+  if (status >= 500 && status < 600) {
+    return '5XX';
+  }
+  return status;
+}
+
 function main(opts) {
   if (arguments[2] && arguments[1] && arguments[1].send) {
     arguments[1].status(500)
@@ -64,6 +81,7 @@ function main(opts) {
     {
       autoregister: true,
       includeStatusCode: true,
+      includeGeneralizedStatusCode: false,
       normalizePath: main.normalizePath,
       formatStatusCode: main.normalizeStatusCode,
       metricType: 'histogram',
@@ -94,6 +112,9 @@ function main(opts) {
 
   function makeHttpMetric() {
     const labels = ['status_code'];
+    if (opts.includeGeneralizedStatusCode) {
+      labels.push('generalized_status_code');
+    }
     if (opts.includeMethod) {
       labels.push('method');
     }
@@ -196,6 +217,10 @@ function main(opts) {
 
       if (opts.includeStatusCode) {
         labels.status_code = opts.formatStatusCode(res, opts);
+      }
+      if (opts.includeGeneralizedStatusCode) {
+        const status_code = req.status_code || req.statusCode;
+        labels.generalized_status_code = generalizeStatusCode(status_code);
       }
       if (opts.includeMethod) {
         labels.method = req.method;

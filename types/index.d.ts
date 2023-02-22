@@ -23,6 +23,7 @@ declare namespace express_prom_bundle {
     customLabels?: { [key: string]: any };
 
     includeStatusCode?: boolean;
+    includeGeneralizedStatusCode?: boolean;
     includeMethod?: boolean;
     includePath?: boolean;
     includeUp?: boolean;
