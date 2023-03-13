@@ -17,7 +17,7 @@ declare namespace express_prom_bundle {
   type NormalizeStatusCodeFn = (res: Response) => number | string;
   type TransformLabelsFn = (labels: Labels, req: Request, res: Response) => void;
 
-  interface Opts {
+  type BaseOptions = {
     autoregister?: boolean;
 
     customLabels?: { [key: string]: any };
@@ -28,23 +28,13 @@ declare namespace express_prom_bundle {
     includeUp?: boolean;
 
     bypass?:
-      | ((req: Request) => boolean)
-      | {
-          onRequest?: (req: Request) => boolean;
-          onFinish?: (req: Request, res: Response) => boolean;
-        };
+    | ((req: Request) => boolean)
+    | {
+      onRequest?: (req: Request) => boolean;
+      onFinish?: (req: Request, res: Response) => boolean;
+    };
 
     excludeRoutes?: Array<string | RegExp>;
-
-    metricType?: 'summary' | 'histogram';
-
-    // https://github.com/siimon/prom-client#histogram
-    buckets?: number[];
-
-    // https://github.com/siimon/prom-client#summary
-    percentiles?: number[];
-    maxAgeSeconds?: number;
-    ageBuckets?: number;
 
     metricsPath?: string;
     httpDurationMetricName?: string;
@@ -64,6 +54,23 @@ declare namespace express_prom_bundle {
       extraMasks?: Array<RegExp | string>;
     };
   }
+
+  /** @see https://github.com/siimon/prom-client#summary */
+  type SummaryOptions = BaseOptions & {
+    metricType?: 'summary';
+    percentiles?: number[];
+    maxAgeSeconds?: number;
+    ageBuckets?: number;
+    pruneAgedBuckets?: boolean;
+  }
+
+  /** @see https://github.com/siimon/prom-client#histogram */
+  type HistogramOptions = BaseOptions & {
+    metricType?: 'histogram';
+    buckets?: number[];
+  }
+
+  type Opts = SummaryOptions | HistogramOptions;
 
   interface Middleware extends RequestHandler {
     metricsMiddleware: RequestHandler;
