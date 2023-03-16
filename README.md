@@ -67,6 +67,7 @@ Additional options for **summary**:
 * **percentiles**: percentiles used for `http_request_duration_seconds` summary
 * **ageBuckets**: ageBuckets configures how many buckets we have in our sliding window for the summary
 * **maxAgeSeconds**: the maxAgeSeconds will tell how old a bucket can be before it is reset
+* **pruneAgedBuckets**: When enabled, timed out buckets will be removed entirely. By default, buckets are reset to 0. Requires `prom-client: ^14.2.0`.
 
 ### Transformation callbacks ###
 
