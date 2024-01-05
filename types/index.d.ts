@@ -1,7 +1,7 @@
 // TypeScript Version: 2.8
 
 import { Request, RequestHandler, Response, Express } from 'express';
-import { DefaultMetricsCollectorConfiguration, Registry } from 'prom-client';
+import { DefaultMetricsCollectorConfiguration, Registry, RegistryContentType } from 'prom-client';
 
 export {};
 
@@ -48,7 +48,7 @@ declare namespace express_prom_bundle {
 
     metricsPath?: string;
     httpDurationMetricName?: string;
-    promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration };
+    promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration<RegistryContentType> };
     promRegistry?: Registry;
     normalizePath?: NormalizePathEntry[] | NormalizePathFn;
     formatStatusCode?: NormalizeStatusCodeFn;
