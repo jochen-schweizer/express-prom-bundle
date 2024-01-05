@@ -159,6 +159,17 @@ For more details:
  * [normalizePath.js](https://github.com/jochen-schweizer/express-prom-bundle/blob/master/src/normalizePath.js) - source code for path processing
 
 
+#### Example 3 (return express route definition):
+
+```javascript
+app.use(promBundle(/* options? */));
+
+promBundle.normalizePath = (req, opts) => {
+  // Return the path of the express route (i.e. /v1/user/:id or /v1/timer/automated/:userid/:timerid")
+  return req.route?.path ?? "NULL";
+};
+```
+
 ## express example
 
 setup std. metrics but exclude `up`-metric:
