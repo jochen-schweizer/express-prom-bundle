@@ -1,19 +1,17 @@
-import * as express from 'express';
-
+import express, { RequestHandler } from 'express';
+import { expectType } from 'tsd'
 import * as promClient from 'prom-client';
+import promBundle, {
+  type Middleware
+} from '..';
 
-import * as promBundle from 'express-prom-bundle';
-
-// $ExpectType Middleware
 const middleware: express.RequestHandler = promBundle({ includeMethod: true });
 
-// $ExpectType: string
-middleware.name;
+expectType<string>(middleware.name);
 
 promClient.register.clear();
 
-// $ExpectType Middleware
-promBundle({
+expectType<Middleware>(promBundle({
   normalizePath: [
     // collect paths like "/customer/johnbobson" as just one "/custom/#name"
     ['^/customer/.*', '/customer/#name'],
@@ -27,12 +25,11 @@ promBundle({
       'ORD[0-9]{5,}' // replace strings like ORD1243423, ORD673562 as #val
     ]
   }
-});
+}));
 
 promClient.register.clear();
 
-// $ExpectType Middleware
-promBundle({
+expectType<Middleware>(promBundle({
   buckets: [0.1, 0.4, 0.7],
   includeMethod: true,
   includePath: true,
@@ -60,7 +57,7 @@ promBundle({
   ],
   formatStatusCode: (res: express.Response) => res.statusCode + 100,
   metricsApp: express()
-});
+}));
 
 promClient.register.clear();
 
@@ -90,8 +87,5 @@ wPromBundle.normalizePath = (req: express.Request, opts: promBundle.Opts) => {
 
 wPromBundle.normalizeStatusCode = (res: express.Response) => res.statusCode.toString();
 
-// $ExpectType RequestHandler
-promBundle.clusterMetrics();
+expectType<RequestHandler>(promBundle.clusterMetrics());
 
-// Missing test
-// const stringReturn: string = promBundle.normalizePath({}, {});

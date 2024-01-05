@@ -3,6 +3,8 @@
 const express = require('express');
 const app = express();
 const promClient = require('prom-client');
+
+// replace this with require('.') when running from library code
 const promBundle = require('express-prom-bundle');
 
 const bundle = promBundle({
