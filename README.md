@@ -4,7 +4,9 @@
 
 Express middleware with popular prometheus metrics in one bundle. It's also compatible with koa v1 and v2 (see below).
 
-Since version 5 it uses **prom-client** as a peer dependency. See: https://github.com/siimon/prom-client
+This library uses **prom-client v15+** as a peer dependency. See: https://github.com/siimon/prom-client
+
+If you need a support for older versions of prom-client (v12-v14), downgrade to express-prom-bundle v6.6.0
 
 Included metrics:
 
