@@ -546,15 +546,37 @@ describe('index', () => {
     });
   });
 
-  it('calls promClient.collectDefaultMetrics', () => {
-    const spy = spyOn(promClient, 'collectDefaultMetrics');
-    bundle({
-      promClient: {
-        collectDefaultMetrics: {
+  describe('option collectDefaultMetrics', () => {
+    it('it gets called', () => {
+      const spy = spyOn(promClient, 'collectDefaultMetrics');
+      bundle({
+        promClient: {
+          collectDefaultMetrics: {
+          }
         }
-      }
+      });
+      expect(spy).toHaveBeenCalledWith({});
     });
-    expect(spy).toHaveBeenCalledWith({});
+
+    it('prefix is used for up metric', (done) => {
+      const instance = bundle({
+        promClient: {
+          collectDefaultMetrics: {
+            prefix: 'hello_'
+          }
+        }
+      });
+      const app = express();
+      app.use(instance);
+      const agent = supertest(app);
+      agent
+        .get('/metrics')
+        .end((err, res) => {
+          expect(res.status).toBe(200);
+          expect(res.text).toMatch(/^hello_up\s1/m);
+          done();
+        });
+    });
   });
 
   describe('usage of clusterMetrics()', () => {

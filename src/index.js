@@ -132,8 +132,12 @@ function main(opts) {
   };
 
   if (opts.includeUp !== false) {
+    let prefix = '';
+    if (opts.promClient && opts.promClient.collectDefaultMetrics) {
+      prefix = opts.promClient.collectDefaultMetrics.prefix || '';
+    }
     metrics.up = new promClient.Gauge({
-      name: 'up',
+      name: `${prefix}up`,
       help: '1 = up, 0 = not up',
       registers: [opts.promRegistry]
     });
