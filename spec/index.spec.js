@@ -20,6 +20,10 @@ function extractBucket (instance, key) {
   }
 }
 
+function getMetricCount (s) {
+  return s.replace(/^#.*$\n|^$\n/gm, '').trim().split('\n').length;
+}
+
 describe('index', () => {
   beforeEach(() => {
     promClient.register.clear();
@@ -342,7 +346,7 @@ describe('index', () => {
 
   describe('usage of normalizePath()', () => {
 
-    it('normalizePath can be replaced gloablly', done => {
+    it('normalizePath can be replaced globally', done => {
       const app = express();
       const original = bundle.normalizePath;
       bundle.normalizePath = () => 'dummy';
@@ -364,6 +368,40 @@ describe('index', () => {
               done();
             });
         });
+    });
+
+    it('respects pruneAgedBuckets', done => {
+      const app = express();
+      const metricsApp = express();
+      const bundled = bundle({
+        metricsApp,
+        metricType: 'summary',
+        includePath: true,
+        maxAgeSeconds: 1,
+        percentiles: [0.5],
+        ageBuckets: 1,
+        pruneAgedBuckets: true,
+      });
+
+      app.use(bundled);
+
+      const agent = supertest(app);
+      const metricsAgent = supertest(metricsApp);
+      agent.get('/foo')
+        .then(() => metricsAgent.get('/metrics'))
+        .then(response => {
+          expect(response.status).toBe(200);
+          // up + bucket, sum, count
+          expect(getMetricCount(response.text)).toBe(4);
+        })
+        .then(() => new Promise(r => setTimeout(r, 1010)))
+        .then(() => metricsAgent.get('/metrics'))
+        .then(response => {
+          expect(response.status).toBe(200);
+          // only up
+          expect(getMetricCount(response.text)).toBe(1);
+        })
+        .finally(done);
     });
 
     it('normalizePath function can be overridden', done => {

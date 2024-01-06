@@ -112,7 +112,8 @@ function main(opts) {
         percentiles: opts.percentiles || [0.5, 0.75, 0.95, 0.98, 0.99, 0.999],
         maxAgeSeconds:  opts.maxAgeSeconds,
         ageBuckets: opts.ageBuckets,
-        registers: [opts.promRegistry]
+        registers: [opts.promRegistry],
+        pruneAgedBuckets: opts.pruneAgedBuckets
       });
     } else if (opts.metricType === 'histogram' || !opts.metricType) {
       return new promClient.Histogram({
