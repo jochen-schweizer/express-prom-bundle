@@ -10,6 +10,16 @@ const supertestKoa = require('supertest-koa-agent');
 const promClient = require('prom-client');
 const cluster = require('cluster');
 
+// for some reason in prom-client 15 the hashmap has a trailing comma
+function extractBucket (instance, key) {
+  const hashmap = instance.metrics.http_request_duration_seconds.hashMap;
+  if (hashmap[key]) {
+    return hashmap[key];
+  } else {
+    return hashmap[key + ','];
+  }
+}
+
 describe('index', () => {
   beforeEach(() => {
     promClient.register.clear();
@@ -158,10 +168,9 @@ describe('index', () => {
     agent
       .get('/test')
       .end(() => {
-        const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
-        expect(metricHashMap['status_code:200']).toBeDefined();
-        const labeled = metricHashMap['status_code:200'];
-        expect(labeled.count).toBe(1);
+        const bucket = extractBucket(instance, 'status_code:200');
+        expect(bucket).toBeDefined();
+        expect(bucket.count).toBe(1);
 
         agent
           .get('/metrics')
@@ -223,11 +232,11 @@ describe('index', () => {
             agent
               .get('/good-word')
               .end(() => {
-                const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
-                expect(metricHashMap['status_code:200']).toBeDefined();
+                const bucket = extractBucket(instance, 'status_code:200');
+                expect(bucket).toBeDefined();
 
                 // only /good-word should be counted
-                expect(metricHashMap['status_code:200'].count).toBe(1);
+                expect(bucket.count).toBe(1);
 
                 agent
                   .get('/metrics')
@@ -266,12 +275,10 @@ describe('index', () => {
           .expect(500);
       })
       .then(() => {
-        const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
-
         // only /200 and /500 should be counted
-        expect(metricHashMap['status_code:200'].count).toBe(1);
-        expect(metricHashMap['status_code:404']).not.toBeDefined();
-        expect(metricHashMap['status_code:500'].count).toBe(1);
+        expect(extractBucket(instance, 'status_code:200').count).toBe(1);
+        expect(extractBucket(instance, 'status_code:404')).not.toBeDefined();
+        expect(extractBucket(instance, 'status_code:500').count).toBe(1);
 
         return agent
           .get('/metrics')
