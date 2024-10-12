@@ -1,6 +1,6 @@
 {
   "name": "express-prom-bundle",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "express middleware with popular prometheus metrics in one bundle",
   "main": "src/index.js",
   "keywords": [
