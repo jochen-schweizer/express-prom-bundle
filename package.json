@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "dts": "^0.1.1",
-    "eslint": "^5.11.0",
+    "eslint": "^9.32.0",
     "express": "^5.0.1",
     "istanbul": "^0.4.5",
     "jasme": "^6.0.0",
