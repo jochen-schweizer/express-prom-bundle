@@ -145,16 +145,16 @@ app.use(promBundle({
 #### Example 2 (override normalizePath function):
 
 ```javascript
-app.use(promBundle(/* options? */));
-
-// let's reuse the existing one and just add some
-// functionality on top
 const originalNormalize = promBundle.normalizePath;
-promBundle.normalizePath = (req, opts) => {
-  const path = originalNormalize(req, opts);
-  // count all docs as one path, but /docs/login as a separate one
-  return (path.match(/^\/docs/) && !path.match(/^\/login/)) ? '/docs/*' : path;
-};
+app.use(promBundle({
+  normalizePath: (req, opts) => {
+    // let's reuse the existing one and just add some
+    // functionality on top
+    const path = originalNormalize(req, opts);
+    // count all docs as one path, but /docs/login as a separate one
+    return (path.match(/^\/docs/) && !path.match(/^\/login/)) ? '/docs/*' : path;
+  }
+}));
 ```
 
 For more details:
