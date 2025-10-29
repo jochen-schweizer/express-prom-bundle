@@ -38,6 +38,7 @@ declare namespace express_prom_bundle {
 
     metricsPath?: string;
     httpDurationMetricName?: string;
+    upMetricName?: string;
     promClient?: { collectDefaultMetrics?: DefaultMetricsCollectorConfiguration<RegistryContentType> };
     promRegistry?: Registry;
     normalizePath?: NormalizePathEntry[] | NormalizePathFn;

@@ -91,6 +91,7 @@ function main(opts) {
   }
 
   const httpMetricName = opts.httpDurationMetricName || 'http_request_duration_seconds';
+  const upMetricName = opts.upMetricName || 'up';
 
   function makeHttpMetric() {
     const labels = ['status_code'];
@@ -138,7 +139,7 @@ function main(opts) {
       prefix = opts.promClient.collectDefaultMetrics.prefix || '';
     }
     metrics.up = new promClient.Gauge({
-      name: `${prefix}up`,
+      name: prefix + upMetricName,
       help: '1 = up, 0 = not up',
       registers: [opts.promRegistry]
     });
