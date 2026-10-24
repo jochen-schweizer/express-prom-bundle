@@ -7,17 +7,12 @@ const bundle = require('../');
 const Koa = require('koa');
 const c2k = require('koa-connect');
 const supertestKoa = require('supertest-koa-agent');
-const promClient = require('prom-client');
+const promClient = require('@prometheus-io/client');
 const cluster = require('cluster');
 
-// for some reason in prom-client 15 the hashmap has a trailing comma
 function extractBucket (instance, key) {
-  const hashmap = instance.metrics.http_request_duration_seconds.hashMap;
-  if (hashmap[key]) {
-    return hashmap[key];
-  } else {
-    return hashmap[key + ','];
-  }
+  const [name, value] = key.split(':');
+  return instance.metrics.http_request_duration_seconds.store.entry({[name]: value});
 }
 
 function getMetricCount (s) {
@@ -200,8 +195,7 @@ describe('index', () => {
         agent
           .get('/some/bad-word')
           .end(() => {
-            const metricHashMap = instance.metrics.http_request_duration_seconds.hashMap;
-            expect(metricHashMap['status_code:200']).not.toBeDefined();
+            expect(extractBucket(instance, 'status_code:200')).not.toBeDefined();
 
             agent
               .get('/metrics')
@@ -638,11 +632,8 @@ describe('index', () => {
       app.use('/cluster_metrics', bundle.clusterMetrics());
       const agent = supertest(app);
 
-      // create a fake worker, which would not respond in time
-      cluster.workers = [{
-        isConnected: () => true,
-        send: () => {}
-      }];
+      spyOn(promClient.ClusterRegistry.prototype, 'clusterMetrics')
+        .and.callFake(() => Promise.reject(new Error('Operation timed out.')));
 
       const errorSpy = spyOn(console, 'error'); // mute console.error
 
