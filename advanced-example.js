@@ -2,7 +2,7 @@
 
 const express = require('express');
 const app = express();
-const promClient = require('prom-client');
+const promClient = require('@prometheus-io/client');
 
 // replace this with require('.') when running from library code
 const promBundle = require('express-prom-bundle');
@@ -32,7 +32,7 @@ const bundle = promBundle({
 
 app.use(bundle);
 
-// native prom-client metric (no prefix)
+// native @prometheus-io/client metric (no prefix)
 const c1 = new promClient.Counter({name: 'c1', help: 'c1 help'});
 c1.inc(10);
 

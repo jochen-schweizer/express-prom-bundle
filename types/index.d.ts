@@ -1,7 +1,7 @@
 // TypeScript Version: 2.8
 
 import { Request, RequestHandler, Response, Express } from 'express';
-import { DefaultMetricsCollectorConfiguration, Registry, RegistryContentType } from 'prom-client';
+import { DefaultMetricsCollectorConfiguration, Registry, RegistryContentType } from '@prometheus-io/client';
 
 export {};
 
@@ -55,7 +55,7 @@ declare namespace express_prom_bundle {
     };
   }
 
-  /** @see https://github.com/siimon/prom-client#summary */
+  /** @see https://github.com/prometheus/client_js#summary */
   type SummaryOptions = BaseOptions & {
     metricType?: 'summary';
     percentiles?: number[];
@@ -64,7 +64,7 @@ declare namespace express_prom_bundle {
     pruneAgedBuckets?: boolean;
   }
 
-  /** @see https://github.com/siimon/prom-client#histogram */
+  /** @see https://github.com/prometheus/client_js#histogram */
   type HistogramOptions = BaseOptions & {
     metricType?: 'histogram';
     buckets?: number[];
