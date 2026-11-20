@@ -6,7 +6,7 @@ Express middleware with popular prometheus metrics in one bundle. It's also comp
 
 This library uses **@prometheus-io/client** (the successor of `prom-client`) as a peer dependency. Requires Node.js 22+. See: https://github.com/prometheus/client_js
 
-If you need to use the old `prom-client` (v12-v15), downgrade to express-prom-bundle v8.0.0 (v15) or v6.6.0 (v12-v14)
+If you need to use the old `prom-client`, downgrade to express-prom-bundle v8.0.0 (v15)
 
 Included metrics:
 
@@ -252,43 +252,6 @@ if (cluster.isMaster) {
     app.use((req, res) => res.send(`hello from pid ${process.pid}\n`));
     app.listen(3000);
     console.log(`worker ${process.pid} listening on 3000`);
-}
-```
-
-## using with kraken.js
-
-Here is meddleware config sample, which can be used in a standard **kraken.js** application.
-In this case the stats for URI paths and HTTP methods are collected separately,
-while replacing all HEX values starting from 5 characters and all IP addresses in the path as #val.
-
-```json
-{
-  "middleware": {
-    "expressPromBundle": {
-      "route": "/((?!status|favicon.ico|robots.txt))*",
-      "priority": 0,
-      "module": {
-        "name": "express-prom-bundle",
-        "arguments": [
-          {
-            "includeMethod": true,
-            "includePath": true,
-            "buckets": [0.1, 1, 5],
-            "promClient": {
-              "collectDefaultMetrics": {
-              }
-            },
-            "urlValueParser": {
-              "minHexLength": 5,
-              "extraMasks": [
-                "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$"
-              ]
-            }
-          }
-        ]
-      }
-    }
-  }
 }
 ```
 
