@@ -4,9 +4,9 @@
 
 Express middleware with popular prometheus metrics in one bundle. It's also compatible with koa v1 and v2 (see below).
 
-This library uses **prom-client v15+** as a peer dependency. See: https://github.com/siimon/prom-client
+This library uses **@prometheus-io/client** (the successor of `prom-client`) as a peer dependency. Requires Node.js 22+. See: https://github.com/prometheus/client_js
 
-If you need a support for older versions of prom-client (v12-v14), downgrade to express-prom-bundle v6.6.0
+If you need to use the old `prom-client` (v12-v15), downgrade to express-prom-bundle v8.0.0 (v15) or v6.6.0 (v12-v14)
 
 Included metrics:
 
@@ -16,7 +16,7 @@ Included metrics:
 ## Install
 
 ```
-npm install prom-client express-prom-bundle
+npm install @prometheus-io/client express-prom-bundle
 ```
 
 ## Sample Usage
@@ -227,7 +227,7 @@ which returns an aggregate of all metrics from all the workers.
 ``` javascript
 const cluster = require('cluster');
 const promBundle = require('express-prom-bundle');
-const promClient = require('prom-client');
+const promClient = require('@prometheus-io/client');
 const numCPUs = Math.max(2, require('os').cpus().length);
 const express = require('express');
 
@@ -243,7 +243,7 @@ if (cluster.isMaster) {
     console.log('cluster metrics listening on 9999');
     console.log('call localhost:9999/metrics for aggregated metrics');
 } else {
-    new promClient.AggregatorRegistry();
+    new promClient.ClusterRegistry();
     const app = express();
     app.use(promBundle({
         autoregister: false, // disable /metrics for single workers

@@ -1,6 +1,6 @@
 import express, { RequestHandler } from 'express';
 import { expectType } from 'tsd'
-import * as promClient from 'prom-client';
+import * as promClient from '@prometheus-io/client';
 import promBundle, {
   type Middleware
 } from '..';

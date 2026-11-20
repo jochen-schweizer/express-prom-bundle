@@ -1,10 +1,10 @@
 language: node_js
 node_js:
-    - "18"
+    - "22"
 notifications:
     email: false
 before_install:
-    - npm install prom-client
+    - npm install @prometheus-io/client
 script:
     - npm run lint
     - npm test
