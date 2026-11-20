@@ -4,7 +4,7 @@ test:
 	npm test
 lint:
 	npx eslint src
-	npm run dtslint-next
+	npm run test-types
 coverage:
 	node_modules/istanbul/lib/cli.js cover \
 		-i 'src/*' \
