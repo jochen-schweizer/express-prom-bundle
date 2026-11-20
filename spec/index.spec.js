@@ -247,7 +247,7 @@ describe('index', () => {
       });
   });
 
-  it('bypass requests, checking res', done => {
+  it('bypass requests, checking res', () => {
     const app = express();
     const instance = bundle({
       bypass: {
@@ -260,7 +260,7 @@ describe('index', () => {
     app.use('/500', (req, res) => res.status(500).send(''));
 
     const agent = supertest(app);
-    agent.get('/200')
+    return agent.get('/200')
       .expect(200)
       .then(() => {
         return agent
@@ -281,8 +281,7 @@ describe('index', () => {
         return agent
           .get('/metrics')
           .expect(200);
-      })
-      .then(done);
+      });
   });
 
   it('complains about deprecated options', () => {
@@ -364,7 +363,7 @@ describe('index', () => {
         });
     });
 
-    it('respects pruneAgedBuckets', done => {
+    it('respects pruneAgedBuckets', () => {
       const app = express();
       const metricsApp = express();
       const bundled = bundle({
@@ -381,7 +380,7 @@ describe('index', () => {
 
       const agent = supertest(app);
       const metricsAgent = supertest(metricsApp);
-      agent.get('/foo')
+      return agent.get('/foo')
         .then(() => metricsAgent.get('/metrics'))
         .then(response => {
           expect(response.status).toBe(200);
@@ -394,8 +393,7 @@ describe('index', () => {
           expect(response.status).toBe(200);
           // only up
           expect(getMetricCount(response.text)).toBe(1);
-        })
-        .finally(done);
+        });
     });
 
     it('normalizePath function can be overridden', done => {
@@ -488,7 +486,7 @@ describe('index', () => {
       });
   });
 
-  it('handles errors in collectors', done => {
+  it('handles errors in collectors', () => {
     const app = express();
     const instance = bundle({});
     app.use(instance);
@@ -503,10 +501,9 @@ describe('index', () => {
 
     // the error will NOT be displayed if NODE_ENV=test (as defined in package.json)
 
-    supertest(app)
+    return supertest(app)
       .get('/metrics')
-      .expect(500)
-      .end((err) => done(err));
+      .expect(500);
   });
 
   it('customLabels={foo: "bar"} adds foo="bar" label to metrics', done => {

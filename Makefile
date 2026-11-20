@@ -10,7 +10,7 @@ coverage:
 		-i 'src/*' \
 		--include-all-sources \
 		--dir coverage \
-		node_modules/jasme/run.js
+		node_modules/jasmine/bin/jasmine.js
 
 coveralls: coverage
 ifndef COVERALLS_REPO_TOKEN
