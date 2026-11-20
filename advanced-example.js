@@ -5,7 +5,9 @@ const app = express();
 const promClient = require('@prometheus-io/client');
 
 // replace this with require('.') when running from library code
-const promBundle = require('express-prom-bundle');
+// const promBundle = require('express-prom-bundle');
+
+const promBundle = require('.')
 
 const bundle = promBundle({
   buckets: [0.1, 0.4, 0.7],
