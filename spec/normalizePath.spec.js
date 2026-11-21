@@ -40,7 +40,7 @@ describe('normalizePath', () => {
     });
 
     it('strips the fragment', () => {
-      expect(normalizePath({url: '/a/b#frag'})).toBe('/a/b');
+      expect(normalizePath({url: '/a/b#frag#and_more'})).toBe('/a/b');
     });
 
     it('strips fragment that comes before query-like text', () => {
@@ -71,6 +71,10 @@ describe('normalizePath', () => {
     it('does not mistake a colon inside the path for a protocol', () => {
       // the empty segment between "//" is dropped by url-value-parser
       expect(normalizePath({url: '/a/http://b'})).toBe('/a/http:/b');
+    });
+
+    it('does not crash on malformed URL', () => {
+      expect(normalizePath({url: '//%5Cfoo.bar:80@example.com'})).toBe('/%5Cfoo.bar:80@example.com');
     });
   });
 });
